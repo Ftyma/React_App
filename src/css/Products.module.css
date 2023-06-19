@@ -1,0 +1,44 @@
+.searchInput {
+  border-radius: 1px;
+}
+
+.searchButton {
+  border-radius: 1px;
+  background-color: #f16f22 !important;
+  border-color: #f16f22 !important;
+}
+
+.productAddButton {
+  border-radius: 100% !important;
+  background-color: #f16f22 !important;
+  border-color: #f16f22 !important;
+}
+
+.productText {
+  line-height: 1.5em;
+  height: 3em; /* height is 2x line-height, so two lines will display */
+  overflow: hidden;
+}
+
+.productDescText {
+  line-height: 1.5em;
+  height: 3em; /* height is 2x line-height, so two lines will display */
+  overflow: hidden;
+}
+
+.bottomButton {
+  background-color: #f16f22 !important;
+  border-color: #f16f22 !important;
+}
+
+.popupCard {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.popupButton {
+  background-color: #f16f22 !important;
+  border-color: #f16f22 !important;
+  width: 100%;
+  justify-content: center;
+}
