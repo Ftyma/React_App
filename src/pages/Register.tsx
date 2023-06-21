@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import footerImg from "../assets/footer.svg";
 import { FormikErrors, useFormik } from "formik";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 
 import custom from "../css/Login.module.css";
@@ -21,8 +21,9 @@ export default function Login() {
   });
 
   let navigate = useNavigate();
-  const goLogin = () => {
-    navigate("/login");
+
+  const goProductPage = () => {
+    navigate("/product");
   };
 
   const authentication = (data: any) => {
@@ -55,17 +56,30 @@ export default function Login() {
 
       return errors;
     },
-    onSubmit: (data) => {
-      axios
-        .post("http://localhost:3000/users", postUsers)
-        .then((res) => console.log(res))
-        .then(() => {
-          alert("succesfully registered");
-        })
-        .catch((error) => {
+    onSubmit: async (data) => {
+      try {
+        await axios
+          .post("http://localhost:3000/users/signup", postUsers)
+          .then((res) => {
+            console.log(res.data);
+            alert("succesfully registered");
+          })
+          .then(() => goProductPage());
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          if (axiosError.response?.status === 409) {
+            alert("Email already registered");
+          } else {
+            console.error(axiosError);
+          }
+        } else {
+          console.error(error);
           window.alert(error);
-          return;
-        });
+        }
+
+        return;
+      }
 
       console.log(data);
       setLoading(true);

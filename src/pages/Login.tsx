@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import footerImg from "../assets/footer.svg";
 import { FormikErrors, useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
 
 import custom from "../css/Login.module.css";
 
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
+import axios, { AxiosError } from "axios";
 
 type LoginForm = {
   name: String;
@@ -20,6 +22,11 @@ export default function Login() {
 
   const authentication = (data: any) => {
     setFormError(false);
+  };
+
+  let navigate = useNavigate();
+  const goProductPage = () => {
+    navigate("/product");
   };
 
   const formik = useFormik<any>({
@@ -41,29 +48,64 @@ export default function Login() {
       }
       return errors;
     },
-    onSubmit: (data) => {
+    onSubmit: async (data) => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/users/signin",
+          {
+            email: data.email,
+            password: data.password,
+          }
+        );
+        console.log(response.data); // Handle the successful sign-in response
+        goProductPage();
+        setLoading(true);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError;
+          if (axiosError.response?.status === 401) {
+            alert("Invalid Email or Password");
+          }
+        }
+        console.error(error);
+      }
+
       console.log(data);
-      setLoading(true);
+      //setLoading(true);
       setTimeout(() => {
         authentication(data);
       }, 500);
     },
   });
 
+  // const getFromErrorMessage = () => {
+  //   let errorMsg: String = "";
+  //   let status: Boolean = false;
+  //   if (formik.touched.email || formik.errors.email) {
+  //     errorMsg = `${formik.errors.email} is required .`;
+  //     status = true;
+  //   } else if (formik.touched.password || formik.errors.password) {
+  //     errorMsg = `${formik.errors.password} is required .`;
+  //     status = true;
+  //   } else {
+  //     status = false;
+  //   }
+  //   console.log(errorMsg);
+  //   return formError && <small className="p-error">{errorMsg}</small>;
+  // };
+
   const getFromErrorMessage = () => {
-    let errorMsg: String = "";
-    let status: Boolean = false;
-    if (formik.touched.email || formik.errors.email) {
-      errorMsg = `${formik.errors.email} is required .`;
-      status = true;
-    } else if (formik.touched.password || formik.errors.password) {
-      errorMsg = `${formik.errors.password} is required .`;
-      status = true;
-    } else {
-      status = false;
+    if (formik.touched.email && formik.errors.email) {
+      return (
+        <small className="p-error">{formik.errors.email} is required.</small>
+      );
     }
-    console.log(errorMsg);
-    return formError && <small className="p-error">{errorMsg}</small>;
+    if (formik.touched.password && formik.errors.password) {
+      return (
+        <small className="p-error">{formik.errors.password} is required.</small>
+      );
+    }
+    return null;
   };
 
   return (

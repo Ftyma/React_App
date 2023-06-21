@@ -4,6 +4,7 @@ import axios from "axios";
 import logo from "../assets/logo.svg";
 import custom from "../css/Products.module.css";
 import Sidebar from "./Sidebar";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -23,6 +24,23 @@ export default function Register() {
   const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
+
+  let navigate = useNavigate();
+
+  const goCart = () => {
+    navigate("/cart");
+  };
+
+  const [addToCart, setAddToCart] = useState({
+    id: 0,
+    sku: "",
+    product_name: "",
+    description: "",
+    price: 0,
+    image: "",
+    group_id: 0,
+    category: [],
+  });
 
   const options = [
     { label: "all", value: 0 },
@@ -49,29 +67,94 @@ export default function Register() {
       const res = await axios.get("http://localhost:3000/products");
       //const data = res.data;
 
-      const mapData = await res.data.map((item: any) => {
-        const prod = {
-          id: item.id,
-          sku: item.sku,
-          product_name: item.product_name,
-          description: item.description,
-          price: item.price,
-          image: item.image,
-          group_id: item.group_id,
-          category: item.category,
-        };
-        return prod;
-      });
+      // const mapData = await res.data.map((item: any) => {
+      //   const prod = {
+      //     id: item.id,
+      //     sku: item.sku,
+      //     product_name: item.product_name,
+      //     description: item.description,
+      //     price: item.price,
+      //     image: item.image,
+      //     group_id: item.group_id,
+      //     category: item.category,
+      //   };
+      //   return prod;
+      // });
 
-      console.log("fetch data", mapData);
-      await sessionStorage.setItem("product", JSON.stringify(mapData));
-      await setProductList(mapData);
+      console.log("fetch data", res.data);
+      await sessionStorage.setItem("product", JSON.stringify(res.data));
+      await setProductList(res.data);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
     } catch (error) {
       console.error("Error fetching data", error);
     }
+  };
+
+  const handleAddToCart = (productId: any) => {
+    getProductById(productId);
+  };
+
+  const addProductToCart = (productId: any) => {
+    try {
+      axios
+        .post("http://localhost:3000/carts/add-carts", { productId })
+        .then((res) => {
+          console.log(res.data);
+        });
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.error) {
+        console.log("Error:", error.response.data.error);
+      } else {
+        console.log("Error:", error.message);
+      }
+    }
+  };
+
+  const getProductById = (productId: any) => {
+    axios
+      .get(`http://localhost:3000/products/${productId}`)
+      .then((res) => {
+        const productData = res.data;
+        console.log(productData);
+        addProductToCart(productId);
+      })
+      .catch((error) => {
+        console.log("Error: ", error.res.data);
+      });
+  };
+
+  const addToCartHandler = async () => {
+    onClickAdd();
+
+    if (!selectedProduct) {
+      console.log(addToCart);
+      alert("No product selected. Please choose a product.");
+      return;
+    }
+
+    const cartItem = {
+      id: selectedProduct.id,
+      sku: selectedProduct.sku,
+      product_name: selectedProduct.product_name,
+      description: selectedProduct.description,
+      price: selectedProduct.price,
+      image: selectedProduct.image,
+      group_id: selectedProduct.group_id,
+      category: selectedProduct.category,
+    };
+
+    await axios
+      .post("http://localhost:3000/carts/add-carts", cartItem)
+      .then((res) => setAddToCart(res.data))
+      .then(() => {
+        alert("Added to cart!");
+      })
+      .catch((error) => {
+        console.error(error);
+        alert("Failed to add to cart. Please try again.");
+      });
   };
 
   const onClickAdd = () => {
@@ -138,6 +221,7 @@ export default function Register() {
   const handleItemClick = (item: any) => {
     setLoading(true);
     setSelectedProduct(item);
+    setAddToCart(item);
     setShowDialog(true);
 
     setTimeout(() => {
@@ -145,7 +229,12 @@ export default function Register() {
     }, 2000);
   };
 
-  const cardFooter = (price: number, showProductButton: boolean) => (
+  const cardFooter = (
+    price: number,
+    showProductButton: boolean,
+
+    productId: any
+  ) => (
     <div className="flex justify-between">
       <span>
         <p className={`text-lg text-orange`}> {Currency(price)}</p>
@@ -155,7 +244,7 @@ export default function Register() {
         <Button
           icon="pi pi-plus"
           className={`${custom.productAddButton}`}
-          onClick={onClickAdd}
+          onClick={() => handleAddToCart(productId)}
         ></Button>
       )}
     </div>
@@ -207,7 +296,7 @@ export default function Register() {
                 {filterData?.map((item: any) => (
                   <div className="col-6 md:col-6 lg:col-3" key={item.id}>
                     <Card
-                      footer={cardFooter(item.price, true)}
+                      // footer={cardFooter(item.price, true, item._id)}
                       className="border rounded-2xl"
                     >
                       <img
@@ -223,6 +312,24 @@ export default function Register() {
                       <p className={`${custom.productDescText}`}>
                         {item.description}
                       </p>
+
+                      <div className="flex justify-between">
+                        <span>
+                          <p className={`text-lg text-orange`}>
+                            {" "}
+                            {Currency(item.price)}
+                          </p>
+                          <p className=" opacity-50 line-through">
+                            {Currency(item.price)}
+                          </p>
+                        </span>
+
+                        <Button
+                          icon="pi pi-plus"
+                          className={`${custom.productAddButton}`}
+                          onClick={() => handleAddToCart(item._id)}
+                        ></Button>
+                      </div>
                     </Card>
                   </div>
                 ))}
@@ -234,6 +341,7 @@ export default function Register() {
             <div className=" flex justify-center">
               <Button
                 className={`w-10/12 justify-center ${custom.bottomButton} `}
+                onClick={goCart}
               >
                 Checkout
                 <div className="flex flex-row ml-3 px-3 items-center bg-amber-300 rounded-xl bg-opacity-30">
@@ -261,7 +369,11 @@ export default function Register() {
                         />
                       </div>
                       <Card
-                        footer={cardFooter(selectedProduct.price, false)}
+                        // footer={cardFooter(
+                        //   selectedProduct.price,
+                        //   false,
+                        //   selectedProduct._id
+                        // )}
                         className={`col-6 md:col-6 border ${custom.popupCard} `}
                       >
                         <p className="text-lg">
@@ -269,11 +381,18 @@ export default function Register() {
                         </p>
 
                         <p>{selectedProduct.description}</p>
+                        <br />
+                        <p className={`text-lg text-orange`}>
+                          {Currency(selectedProduct.price)}
+                        </p>
+                        <p className=" opacity-50 line-through">
+                          {Currency(selectedProduct.price)}
+                        </p>
                       </Card>
                     </div>
                     <Button
                       icon="pi pi-plus"
-                      onClick={onClickAdd}
+                      onClick={addToCartHandler}
                       className={`${custom.popupButton}`}
                     >
                       Add to Cart
