@@ -78,11 +78,11 @@ export default function Test() {
   };
 
   const handleAddToCart = (productId: any) => {
-    onClickAdd();
+    increment();
     getProductById(productId);
   };
 
-  const addProductToCart = (product) => {
+  const addProductToCart = (product: any) => {
     axios
       .post("http://localhost:3000/carts/add-carts", product)
       .then((res) => {
@@ -109,7 +109,7 @@ export default function Test() {
       });
   };
 
-  const onClickAdd = () => {
+  const increment = () => {
     setCount(count + 1);
   };
 
@@ -265,6 +265,7 @@ export default function Test() {
             </div>
           </div>
 
+          {/* Dialog Popup */}
           {selectedProduct && showDialog && (
             <div>
               <Dialog visible={showDialog} onHide={() => setShowDialog(false)}>
@@ -282,11 +283,6 @@ export default function Test() {
                         />
                       </div>
                       <Card
-                        // footer={cardFooter(
-                        //   selectedProduct.price,
-                        //   false,
-                        //   selectedProduct._id
-                        // )}
                         className={`col-6 md:col-6 border ${custom.popupCard} `}
                       >
                         <p className="text-lg">

@@ -298,6 +298,7 @@ export default function Register() {
                     <Card
                       // footer={cardFooter(item.price, true, item._id)}
                       className="border rounded-2xl"
+                      key={item._id}
                     >
                       <img
                         src={item.image}
