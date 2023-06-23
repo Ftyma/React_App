@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const cartSchema = mongoose.Schema(
   {
+    _id: {
+      // Update the field name to _id
+      type: mongoose.Schema.Types.ObjectId,
+      auto: true,
+    },
+
     id: {
       type: Number,
       required: true,
@@ -36,6 +42,10 @@ const cartSchema = mongoose.Schema(
         required: true,
       },
     ],
+    quantity: {
+      type: Number,
+      // required: true,
+    },
   },
 
   {

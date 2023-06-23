@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import logo from "../assets/logo.svg";
@@ -13,8 +13,10 @@ import { Dialog } from "primereact/dialog";
 import { Currency } from "./Currency";
 
 import { ProgressSpinner } from "primereact/progressspinner";
+import { addProductToCart, getProductById } from "../utils/cartUtils";
+import { useShoppingCart } from "../context/ShoppingCartContext";
 
-export default function Register() {
+export default function Product() {
   const [productList, setProductList] = useState([]);
   const [filterQuery, setFilterQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState(0);
@@ -24,6 +26,9 @@ export default function Register() {
   const [showDialog, setShowDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
+  const [cart, setCart] = useState([]);
+
+  const { cartQuantity } = useShoppingCart();
 
   let navigate = useNavigate();
 
@@ -65,22 +70,6 @@ export default function Register() {
 
     try {
       const res = await axios.get("http://localhost:3000/products");
-      //const data = res.data;
-
-      // const mapData = await res.data.map((item: any) => {
-      //   const prod = {
-      //     id: item.id,
-      //     sku: item.sku,
-      //     product_name: item.product_name,
-      //     description: item.description,
-      //     price: item.price,
-      //     image: item.image,
-      //     group_id: item.group_id,
-      //     category: item.category,
-      //   };
-      //   return prod;
-      // });
-
       console.log("fetch data", res.data);
       await sessionStorage.setItem("product", JSON.stringify(res.data));
       await setProductList(res.data);
@@ -93,71 +82,22 @@ export default function Register() {
   };
 
   const handleAddToCart = (productId: any) => {
-    getProductById(productId);
-  };
-
-  const addProductToCart = (productId: any) => {
-    try {
-      axios
-        .post("http://localhost:3000/carts/add-carts", { productId })
-        .then((res) => {
-          console.log(res.data);
-        });
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.error) {
-        console.log("Error:", error.response.data.error);
-      } else {
-        console.log("Error:", error.message);
-      }
-    }
-  };
-
-  const getProductById = (productId: any) => {
-    axios
-      .get(`http://localhost:3000/products/${productId}`)
-      .then((res) => {
-        const productData = res.data;
-        console.log(productData);
-        addProductToCart(productId);
+    getProductById(productId)
+      .then((productData) => {
+        addProductToCart(productData)
+          .then(() => {
+            alert("added to cart");
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
       })
       .catch((error) => {
-        console.log("Error: ", error.res.data);
+        alert(error.message);
       });
   };
 
-  const addToCartHandler = async () => {
-    onClickAdd();
-
-    if (!selectedProduct) {
-      console.log(addToCart);
-      alert("No product selected. Please choose a product.");
-      return;
-    }
-
-    const cartItem = {
-      id: selectedProduct.id,
-      sku: selectedProduct.sku,
-      product_name: selectedProduct.product_name,
-      description: selectedProduct.description,
-      price: selectedProduct.price,
-      image: selectedProduct.image,
-      group_id: selectedProduct.group_id,
-      category: selectedProduct.category,
-    };
-
-    await axios
-      .post("http://localhost:3000/carts/add-carts", cartItem)
-      .then((res) => setAddToCart(res.data))
-      .then(() => {
-        alert("Added to cart!");
-      })
-      .catch((error) => {
-        console.error(error);
-        alert("Failed to add to cart. Please try again.");
-      });
-  };
-
-  const onClickAdd = () => {
+  const increment = () => {
     setCount(count + 1);
   };
 
@@ -167,26 +107,6 @@ export default function Register() {
   const handleClickCat = (e: any) => {
     setFilterCategory(e);
   };
-
-  // const filterProducts = productList.filter((item: any) => {
-  //   if (filterCategory === "all") {
-  //     return true;
-  //   } else {
-  //     return item.category.some((category: any) => category === filterCategory);
-  //   }
-  // });
-
-  // const filterProduct = () => {
-  //   // filterCategory;
-
-  //   const filter = productList.filter(
-  //     (item: any) =>
-  //       item.product_name.toLowerCase().includes(filterQuery.toLowerCase()) &&
-  //       item.category.includes(filterCategory)
-  //   );
-  //   console.log("filter data", filter);
-  //   setFilterData(filter);
-  // };
 
   const filterProduct = () => {
     if (!filterCategory && !filterQuery) {
@@ -228,27 +148,6 @@ export default function Register() {
       setLoading(false);
     }, 2000);
   };
-
-  const cardFooter = (
-    price: number,
-    showProductButton: boolean,
-
-    productId: any
-  ) => (
-    <div className="flex justify-between">
-      <span>
-        <p className={`text-lg text-orange`}> {Currency(price)}</p>
-        <p className=" opacity-50 line-through">{Currency(price)}</p>
-      </span>
-      {showProductButton && (
-        <Button
-          icon="pi pi-plus"
-          className={`${custom.productAddButton}`}
-          onClick={() => handleAddToCart(productId)}
-        ></Button>
-      )}
-    </div>
-  );
 
   return (
     <>
@@ -347,12 +246,13 @@ export default function Register() {
                 Checkout
                 <div className="flex flex-row ml-3 px-3 items-center bg-amber-300 rounded-xl bg-opacity-30">
                   <i className="pi pi-shopping-cart pr-2"></i>
-                  <p>{count}</p>
+                  <p>{cartQuantity}</p>
                 </div>
               </Button>
             </div>
           </div>
 
+          {/* Dialog Popup */}
           {selectedProduct && showDialog && (
             <div>
               <Dialog visible={showDialog} onHide={() => setShowDialog(false)}>
@@ -370,11 +270,6 @@ export default function Register() {
                         />
                       </div>
                       <Card
-                        // footer={cardFooter(
-                        //   selectedProduct.price,
-                        //   false,
-                        //   selectedProduct._id
-                        // )}
                         className={`col-6 md:col-6 border ${custom.popupCard} `}
                       >
                         <p className="text-lg">
@@ -393,7 +288,7 @@ export default function Register() {
                     </div>
                     <Button
                       icon="pi pi-plus"
-                      onClick={addToCartHandler}
+                      onClick={() => handleAddToCart(selectedProduct._id)}
                       className={`${custom.popupButton}`}
                     >
                       Add to Cart
@@ -408,3 +303,176 @@ export default function Register() {
     </>
   );
 }
+
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { StoreItem } from "../components/StoreItem";
+// import { InputText } from "primereact/inputtext";
+// import { CustomDialog } from "../components/CustomDialog";
+// import { ProgressSpinner } from "primereact/progressspinner";
+
+// import Navbar from "../components/Navbar";
+// import { Dialog } from "primereact/dialog";
+
+// export default function Store() {
+//   const [productAll, setProductAll] = useState([]);
+//   const [filterQuery, setFilterQuery] = useState("");
+//   const [filterCategory, setFilterCategory] = useState(0);
+//   const [filterData, setFilterData] = useState<object[]>();
+
+//   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+//   const [showDialog, setShowDialog] = useState(false);
+//   const [loading, setLoading] = useState(true);
+//   const [count, setCount] = useState(0);
+
+//   useEffect(() => {
+//     fetchProduct();
+//   }, []);
+
+//   useEffect(() => {
+//     // do function filter item
+//     filterProduct();
+//   }, [filterQuery, filterCategory]);
+
+//   const fetchProduct = async () => {
+//     try {
+//       const res = await axios.get("http://localhost:3000/products");
+//       setProductAll(res.data);
+//       console.log("fetched products ", res.data);
+//     } catch (error) {
+//       console.error("Error fetching products ", error);
+//     }
+//   };
+
+//   const handleFilter = (e: any) => {
+//     setFilterQuery(e.target.value);
+//   };
+
+//   const filterProduct = () => {
+//     if (!filterCategory && !filterQuery) {
+//       console.log("fetch all", productAll);
+//       //const item = sessionStorage.getItem("product");
+//       //setFilterData(JSON.parse(item));
+//       setFilterData(productAll);
+//       return;
+//     }
+
+//     const filter = productAll.filter((item: any) => {
+//       const queryMatch = item.product_name
+//         .toLowerCase()
+//         .includes(filterQuery.toLowerCase());
+//       const categoryMatch = item.category.includes(filterCategory);
+
+//       if (filterQuery && filterCategory) {
+//         return queryMatch && categoryMatch;
+//       } else if (filterQuery) {
+//         return queryMatch;
+//       } else if (filterCategory) {
+//         return categoryMatch;
+//       } else {
+//         return true;
+//       }
+//     });
+
+//     console.log("filter data", filter);
+//     setFilterData(filter);
+//   };
+
+//   const handleItemClick = (item: any) => {
+//     //setLoading(true);
+//     setSelectedProduct(item);
+//     //setAddToCart(item);
+//     setShowDialog(true);
+
+//     setTimeout(() => {
+//       setLoading(false);
+//     }, 2000);
+//   };
+
+//   const handleAddToCart = (productId: any) => {
+//     increment();
+//     getProductById(productId);
+//   };
+
+//   const addProductToCart = (product: any) => {
+//     axios
+//       .post("http://localhost:3000/carts/add-carts", product)
+//       .then((res) => {
+//         console.log("add product to cart", res.data);
+//         alert("Added to cart!");
+//       })
+//       .catch((error) => {
+//         alert("Failed to add to cart. Please try again.");
+//         console.log("error adding product to cart: ", error);
+//       });
+//   };
+
+//   //get selected product ID and push it to addProductToCart
+//   const getProductById = (productId: any) => {
+//     axios
+//       .get(`http://localhost:3000/products/${productId}`)
+//       .then((res) => {
+//         const productData = res.data;
+//         console.log("product get by ID:", productData);
+//         addProductToCart(productData);
+//       })
+//       .catch((error) => {
+//         console.log("Error: ", error.res.data);
+//       });
+//   };
+
+//   const increment = () => {
+//     setCount(count + 1);
+//   };
+
+//   return (
+//     <>
+//       <div className="bg-orange">
+//         <Navbar />
+//         <div className="relative border rounded-3xl bg-white w-full top-48">
+//           {/* Search Products*/}
+//           <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 pt-10">
+//             <h1 className="text-2xl">List of Products</h1>
+//             <div className="flex justify-content-end">
+//               <span className="p-input-icon-right">
+//                 <i className="pi pi-search" />
+//                 <InputText
+//                   value={filterQuery}
+//                   onChange={handleFilter}
+//                   placeholder="Keyword Search"
+//                 />
+//               </span>
+//             </div>
+//           </div>
+
+//           {/* Render products */}
+//           <div className="grid w-11/12 justify-center mx-auto pt-24">
+//             {filterData.map((item) => (
+//               <div key={item._id}>
+//                 <StoreItem {...item} />
+//               </div>
+//             ))}
+//           </div>
+
+//           {selectedProduct && showDialog && (
+//             <div>
+//               <Dialog visible={showDialog} onHide={() => setShowDialog(false)}>
+//                 {loading ? (
+//                   <div className="flex w-96 h-64">
+//                     <ProgressSpinner className="justify-center" />
+//                   </div>
+//                 ) : (
+//                   <CustomDialog
+//                     selectedProduct={selectedProduct}
+//                     loading={loading}
+//                     onClick={() => handleAddToCart(selectedProduct._id)}
+//                   />
+//                 )}
+//               </Dialog>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </>
+//   );
+// }

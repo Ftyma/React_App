@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Cart = require("../models/cartModel");
+const Product = require("../models/productModel");
 
 // Get all carts
 router.get("/get-carts", async (req, res) => {
@@ -28,44 +29,40 @@ router.get("/get-cart/:id", async (req, res) => {
   }
 });
 
-// Create a new cart
+//Create a new cart
 router.post("/add-carts", async (req, res) => {
-  const { productId, quantity } = req.body;
+  const productId = req.body.id;
+
+  const updateObject = {
+    $inc: { quantity: 1 },
+    $set: {
+      sku: req.body.sku,
+      product_name: req.body.product_name,
+      description: req.body.description,
+      price: req.body.price,
+      image: req.body.image,
+      group_id: req.body.group_id,
+      category: req.body.category,
+    },
+  };
 
   try {
-    const cart = await Cart.create(req.body);
-    res.status(201).json(cart);
+    const updatedCartItems = await Cart.findOneAndUpdate(
+      { id: productId },
+      updateObject,
+      { upsert: true, new: true }
+    );
+
+    if (updatedCartItems) {
+      console.log(updatedCartItems);
+      res.json({ message: "Quantity updated successfully!" });
+    } else {
+      res.json({ message: "Product added to cart!" });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
-
-// router.post("/add-carts", async (req, res) => {
-//   const { productId, quantity } = req.body;
-
-//   try {
-//     let item = await Cart.findById(productId);
-
-//     if(item){
-//       let itemIndex = item.findIndex(p=> p._id == productId );
-
-//       if(itemIndex>-1){
-//         let prodItem = cart[itemIndex];
-//         productId.quantity += quantity;
-//         cart[itemIndex] = pro
-//       }
-
-//       cart = await cart.save();
-//       return res.status(201).send(cart);
-
-//     }
-
-//     const cart = await Cart.create(req.body);
-//     res.status(201).json(cart);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// });
 
 router.delete("/delete-carts/:id", async (req, res) => {
   try {
@@ -79,6 +76,48 @@ router.delete("/delete-carts/:id", async (req, res) => {
     res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Update cart
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const cart = await Cart.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    if (!cart) {
+      return res.status(404).json({ message: `Cart not found with ID ${id}` });
+    }
+    res.status(200).json(cart);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/update-cart", async (req, res) => {
+  try {
+    const updatedItems = req.body;
+
+    // Assuming the updatedItems is an array of cart items with id and quantity properties
+    // Loop through the updatedItems array and update each cart item in the database
+    for (const updatedItem of updatedItems) {
+      const { id, quantity } = updatedItem;
+
+      // Find the cart item by id and update its quantity
+      await Cart.findOneAndUpdate(
+        { id: id },
+        { quantity: quantity },
+        { new: true }
+      );
+    }
+
+    // Fetch the updated cart items from the database and send them back as the response
+    const updatedCartItems = await Cart.find();
+    res.json(updatedCartItems);
+  } catch (error) {
+    console.error("Error updating cart items:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

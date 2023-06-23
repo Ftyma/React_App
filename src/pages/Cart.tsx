@@ -2,19 +2,36 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Currency } from "./Currency";
 import logo from "../assets/logo.svg";
+import {
+  addProductToCart,
+  getProductById,
+  calculateCartQuantity,
+} from "../utils/cartUtils";
 
 const Cart = () => {
   const [getCart, setGetCart] = useState([]);
-  const [totalSum, setTotalSum] = useState(0);
   const [amount, setAmount] = useState(1);
 
   useEffect(() => {
     fetchCart();
   }, []);
 
-  const handleAdd = (itemId: number) => {
-    setAmount(amount + 1);
+  const handleAdd = async (productId) => {
+    getProductById(productId)
+      .then((productData) => {
+        addProductToCart(productData)
+          .then(() => {
+            alert("added to cart");
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
+
   const handleMinus = () => {
     if (amount > 1) {
       setAmount(amount - 1);
@@ -35,9 +52,9 @@ const Cart = () => {
     try {
       let total: number = 0;
       getCart?.map((item: any) => {
-        total += item.price;
+        total += item.price * item.quantity;
       });
-      return Currency(total);
+      return total;
     } catch (error) {
       console.log(error);
     }
@@ -80,10 +97,10 @@ const Cart = () => {
                   -
                 </button>
 
-                <p className="px-2 pt-2 m-auto">{amount}</p>
+                <p className="px-2 pt-2 m-auto">{item.quantity}</p>
 
                 <button
-                  onClick={() => handleAdd(item.id)}
+                  onClick={() => handleAdd(item._id)}
                   className="m-auto rounded-full border px-3 py-2"
                 >
                   +
@@ -104,7 +121,7 @@ const Cart = () => {
         ))}
         <div className="flex justify-center py-12">
           <p className="text-xl font-semibold mr-5">Total: </p>
-          <p className="text-lg">{totalPrice()}</p>
+          <p className="text-lg">{Currency(totalPrice())}</p>
         </div>
       </div>
     </div>
