@@ -20,11 +20,12 @@ type CartItem = {
 type ShoppingCartContext = {
   openCart: () => void;
   closeCart: () => void;
+  handleAddToCart: (id: number) => void;
   getItemQuantity: (id: number) => number;
-  increaseCartQuantity: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   cartQuantity: number;
   cartItems: CartItem[];
+  removeItem: (id: number) => void;
 };
 
 const ShoppingCartContext = createContext({} as ShoppingCartContext);
@@ -35,13 +36,7 @@ export function useShoppingCart() {
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  //   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>(
-  //     "shopping-cart",
-  //     []
-  //   );
-
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [quantity, setQuantity] = useState(0);
 
   useEffect(() => {
     fetchCart();
@@ -68,58 +63,10 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
     return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
 
-  //   function increaseCartQuantity(id: number) {
-  //     setCartItems((currItems) => {
-  //       if (currItems.find((item) => item.id === id) == null) {
-  //         return [...currItems, { id, quantity: 1 }];
-  //       } else {
-  //         return currItems.map((item) => {
-  //           if (item.id === id) {
-  //             return { ...item, quantity: item.quantity + 1 };
-  //           } else {
-  //             return item;
-  //           }
-  //         });
-  //       }
-  //     });
-  //   }
-
-  function increaseCartQuantity(id: number) {
-    const item = cartItems.find((item) => item.id == id);
-    if (item) {
-      //if item in cart, increase quantity 1
-      const updatedItems = cartItems.map((item) => {
-        if (item.id === id) {
-          return { ...item, quantity: item.quantity + 1 };
-        } else {
-          return item;
-        }
-      });
-      updateCartItems(updatedItems);
-    } else {
-      // If the item doesn't exist in the cart, add it with quantity 1
-      const newItem = {
-        id: id,
-        quantity: 1,
-      };
-      const updatedItems = [...cartItems, newItem];
-      updateCartItems(updatedItems);
-    }
-  }
-
   const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
   );
-
-  //   const cartQuantity = () => {
-  //     const calcQuantity = cartItems.reduce(
-  //       (quantity, item) => item.quantity + quantity,
-  //       0
-  //     );
-  //     console.log(calcQuantity);
-  //     setQuantity(calcQuantity);
-  //   };
 
   function decreaseCartQuantity(id: number) {
     setCartItems((currItems) => {
@@ -137,25 +84,67 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
     });
   }
 
-  function updateCartItems(updatedItems: CartItem[]) {
-    axios
-      .put(`http://localhost:3000/carts/update-cart`, updatedItems)
-      .then((res) => {
-        const data = res.data;
-        console.log(data);
-        setCartItems(data);
-        //cartQuantity(data);
+  const handleAddToCart = async (productId: any) => {
+    getProductById(productId)
+      .then((productData) => {
+        addProductToCart(productData)
+          .then(() => {
+            alert("added to cart");
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
       })
       .catch((error) => {
-        console.error("Error updating cart items:", error);
+        alert(error.message);
       });
-  }
+  };
+
+  const addProductToCart = async (product: any) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/carts/add-carts",
+        product
+      );
+      console.log("add product to cart", res.data);
+      return res.data;
+    } catch (error) {
+      console.log("error adding product to cart: ", error);
+      throw new Error("Failed to add to cart.");
+    }
+  };
+
+  const getProductById = async (productId: any) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/products/${productId}`
+      );
+      const productData = res.data;
+      console.log("product get by ID:", productData);
+      return productData;
+    } catch (error) {
+      console.log("Error: ", error.response.data);
+      throw new Error("Failed to retrieve product.");
+    }
+  };
+
+  const removeItem = async (id: number) => {
+    await axios
+      .delete(`http://localhost:3000/carts/delete-carts/${id}`)
+      .then(() => {
+        console.log("Deleted item: ", id);
+        alert(`Successfully deleted item ${id}`);
+        window.location.reload();
+      })
+      .catch((error) => console.log("error deleting item", error));
+  };
 
   return (
     <ShoppingCartContext.Provider
       value={{
+        handleAddToCart,
         getItemQuantity,
-        increaseCartQuantity,
+        removeItem,
         decreaseCartQuantity,
         cartItems,
         cartQuantity,

@@ -16,14 +16,12 @@ type StoreItemProps = {
     price: number;
     image: string;
   };
-  handleAddToCart: (productId: string) => void;
 };
 
-export function StoreItem({ product, handleAddToCart }: StoreItemProps) {
+export function StoreItem({ product }: StoreItemProps) {
   const [showDialog, setShowDialog] = useState(false);
 
-  const { getItemQuantity, increaseCartQuantity, decreaseCartQuantity } =
-    useShoppingCart();
+  const { getItemQuantity, handleAddToCart, cartQuantity } = useShoppingCart();
 
   const quantity = getItemQuantity(product.id);
 
@@ -71,14 +69,8 @@ export function StoreItem({ product, handleAddToCart }: StoreItemProps) {
             <Button
               className={`${custom.productAddButton}`}
               icon="pi pi-plus"
-              onClick={() => increaseCartQuantity(product.id)}
+              onClick={() => handleAddToCart(product._id)}
             ></Button>
-            <Button
-              onClick={addToCart}
-              className={`${custom.productAddButton}`}
-            >
-              Add
-            </Button>
           </div>
 
           {showDialog && (
@@ -101,7 +93,7 @@ export function StoreItem({ product, handleAddToCart }: StoreItemProps) {
               </div>
               <Button
                 icon="pi pi-plus"
-                onClick={addToCart}
+                onClick={() => handleAddToCart(product._id)}
                 className={`${custom.popupButton}`}
               >
                 Add to Cart

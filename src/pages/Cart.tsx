@@ -1,57 +1,30 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { Currency } from "./Currency";
 import logo from "../assets/logo.svg";
-import {
-  addProductToCart,
-  getProductById,
-  calculateCartQuantity,
-} from "../utils/cartUtils";
+
+import { useShoppingCart } from "../context/ShoppingCartContext";
 
 const Cart = () => {
-  const [getCart, setGetCart] = useState([]);
   const [amount, setAmount] = useState(1);
+  const { cartItems, handleAddToCart, removeItem, decreaseCartQuantity } =
+    useShoppingCart();
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const handleAdd = async (productId) => {
-    getProductById(productId)
-      .then((productData) => {
-        addProductToCart(productData)
-          .then(() => {
-            alert("added to cart");
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      })
-      .catch((error) => {
-        alert(error.message);
+  const handleMinus = (productId: any) => {
+    try {
+      let productQuantity: number = 1;
+      cartItems?.map((item: any) => {
+        productQuantity--;
       });
-  };
-
-  const handleMinus = () => {
-    if (amount > 1) {
-      setAmount(amount - 1);
+      return productQuantity;
+    } catch (error) {
+      console.log(error);
     }
-  };
-
-  const fetchCart = async () => {
-    await axios
-      .get("http://localhost:3000/carts/get-carts")
-      .then((res) => {
-        setGetCart(res.data);
-        //calculateTotal(res.data);
-      })
-      .catch((err) => console.log(err));
   };
 
   const totalPrice = () => {
     try {
       let total: number = 0;
-      getCart?.map((item: any) => {
+      cartItems?.map((item: any) => {
         total += item.price * item.quantity;
       });
       return total;
@@ -60,24 +33,13 @@ const Cart = () => {
     }
   };
 
-  const removeItem = async (id) => {
-    await axios
-      .delete(`http://localhost:3000/carts/delete-carts/${id}`)
-      .then(() => {
-        console.log("Deleted item: ", id);
-        alert(`Successfully deleted item ${id}`);
-        window.location.reload();
-      })
-      .catch((error) => console.log("error deleting item", error));
-  };
-
   return (
     <div className="bg-orange h-screen">
       <img src={logo} className="mx-auto w-3/12 h-50" />
       <div className="bg-white h-full rounded-3xl">
         <br />
         <h1 className="text-3xl text-left ml-7 mt-4">Shopping Cart</h1>
-        {getCart.map((item) => (
+        {cartItems.map((item) => (
           <>
             <div
               key={item.id}
@@ -91,7 +53,7 @@ const Cart = () => {
 
               <div className="flex col-3 md:col-2 m-auto ">
                 <button
-                  onClick={handleMinus}
+                  onClick={() => decreaseCartQuantity(item._id)}
                   className="m-auto rounded-full border px-3 py-2"
                 >
                   -
@@ -100,7 +62,7 @@ const Cart = () => {
                 <p className="px-2 pt-2 m-auto">{item.quantity}</p>
 
                 <button
-                  onClick={() => handleAdd(item._id)}
+                  onClick={() => handleAddToCart(item._id)}
                   className="m-auto rounded-full border px-3 py-2"
                 >
                   +

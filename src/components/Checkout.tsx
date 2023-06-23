@@ -2,11 +2,11 @@ import React from "react";
 import { Button } from "primereact/button";
 import custom from "../css/Products.module.css";
 import { useNavigate } from "react-router-dom";
-//import { useShoppingCart } from "../context/ShoppingCartContext";
+import { useShoppingCart } from "../context/ShoppingCartContext";
 
 export function Checkout() {
-  // const { openCart, cartQuantity } = useShoppingCart();
-  const cartQuantity = 1;
+  const { cartQuantity } = useShoppingCart();
+
   let navigate = useNavigate();
 
   const goCart = () => {

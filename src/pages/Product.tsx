@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
 import logo from "../assets/logo.svg";
 import custom from "../css/Products.module.css";
 import Sidebar from "./Sidebar";
 import { useNavigate } from "react-router-dom";
+import SelectionFilter from "../components/SelectionFilter";
 
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -13,7 +13,6 @@ import { Dialog } from "primereact/dialog";
 import { Currency } from "./Currency";
 
 import { ProgressSpinner } from "primereact/progressspinner";
-import { addProductToCart, getProductById } from "../utils/cartUtils";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 
 export default function Product() {
@@ -28,7 +27,7 @@ export default function Product() {
   const [count, setCount] = useState(0);
   const [cart, setCart] = useState([]);
 
-  const { cartQuantity } = useShoppingCart();
+  const { cartQuantity, handleAddToCart } = useShoppingCart();
 
   let navigate = useNavigate();
 
@@ -79,26 +78,6 @@ export default function Product() {
     } catch (error) {
       console.error("Error fetching data", error);
     }
-  };
-
-  const handleAddToCart = (productId: any) => {
-    getProductById(productId)
-      .then((productData) => {
-        addProductToCart(productData)
-          .then(() => {
-            alert("added to cart");
-          })
-          .catch((error) => {
-            alert(error.message);
-          });
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
-
-  const increment = () => {
-    setCount(count + 1);
   };
 
   const handleFilter = (e: any) => {
@@ -152,11 +131,6 @@ export default function Product() {
   return (
     <>
       <div className="flex bg-orange w-screen h-screen">
-        <div className="fixed bg-orange w-full z-2">
-          <Sidebar />
-          <img src={logo} className="mx-auto w-3/12 h-50" />
-        </div>
-
         <div className="bg-white w-full h-full rounded-3xl mt-44">
           <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 pt-10">
             <h1 className="text-2xl">List of Products</h1>
@@ -174,17 +148,11 @@ export default function Product() {
           </div>
 
           {/* Selection Filter */}
-          <div>
-            {options.map((option, i) => (
-              <Button
-                key={i}
-                value={filterCategory}
-                onClick={() => handleClickCat(option.value)}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
+          <SelectionFilter
+            options={options}
+            filterCategory={filterCategory}
+            handleClickCat={handleClickCat}
+          />
 
           {/* Product Card */}
           <div className="grid mx-auto mt-8 w-11/12 pb-32">
@@ -303,176 +271,3 @@ export default function Product() {
     </>
   );
 }
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { StoreItem } from "../components/StoreItem";
-// import { InputText } from "primereact/inputtext";
-// import { CustomDialog } from "../components/CustomDialog";
-// import { ProgressSpinner } from "primereact/progressspinner";
-
-// import Navbar from "../components/Navbar";
-// import { Dialog } from "primereact/dialog";
-
-// export default function Store() {
-//   const [productAll, setProductAll] = useState([]);
-//   const [filterQuery, setFilterQuery] = useState("");
-//   const [filterCategory, setFilterCategory] = useState(0);
-//   const [filterData, setFilterData] = useState<object[]>();
-
-//   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-//   const [showDialog, setShowDialog] = useState(false);
-//   const [loading, setLoading] = useState(true);
-//   const [count, setCount] = useState(0);
-
-//   useEffect(() => {
-//     fetchProduct();
-//   }, []);
-
-//   useEffect(() => {
-//     // do function filter item
-//     filterProduct();
-//   }, [filterQuery, filterCategory]);
-
-//   const fetchProduct = async () => {
-//     try {
-//       const res = await axios.get("http://localhost:3000/products");
-//       setProductAll(res.data);
-//       console.log("fetched products ", res.data);
-//     } catch (error) {
-//       console.error("Error fetching products ", error);
-//     }
-//   };
-
-//   const handleFilter = (e: any) => {
-//     setFilterQuery(e.target.value);
-//   };
-
-//   const filterProduct = () => {
-//     if (!filterCategory && !filterQuery) {
-//       console.log("fetch all", productAll);
-//       //const item = sessionStorage.getItem("product");
-//       //setFilterData(JSON.parse(item));
-//       setFilterData(productAll);
-//       return;
-//     }
-
-//     const filter = productAll.filter((item: any) => {
-//       const queryMatch = item.product_name
-//         .toLowerCase()
-//         .includes(filterQuery.toLowerCase());
-//       const categoryMatch = item.category.includes(filterCategory);
-
-//       if (filterQuery && filterCategory) {
-//         return queryMatch && categoryMatch;
-//       } else if (filterQuery) {
-//         return queryMatch;
-//       } else if (filterCategory) {
-//         return categoryMatch;
-//       } else {
-//         return true;
-//       }
-//     });
-
-//     console.log("filter data", filter);
-//     setFilterData(filter);
-//   };
-
-//   const handleItemClick = (item: any) => {
-//     //setLoading(true);
-//     setSelectedProduct(item);
-//     //setAddToCart(item);
-//     setShowDialog(true);
-
-//     setTimeout(() => {
-//       setLoading(false);
-//     }, 2000);
-//   };
-
-//   const handleAddToCart = (productId: any) => {
-//     increment();
-//     getProductById(productId);
-//   };
-
-//   const addProductToCart = (product: any) => {
-//     axios
-//       .post("http://localhost:3000/carts/add-carts", product)
-//       .then((res) => {
-//         console.log("add product to cart", res.data);
-//         alert("Added to cart!");
-//       })
-//       .catch((error) => {
-//         alert("Failed to add to cart. Please try again.");
-//         console.log("error adding product to cart: ", error);
-//       });
-//   };
-
-//   //get selected product ID and push it to addProductToCart
-//   const getProductById = (productId: any) => {
-//     axios
-//       .get(`http://localhost:3000/products/${productId}`)
-//       .then((res) => {
-//         const productData = res.data;
-//         console.log("product get by ID:", productData);
-//         addProductToCart(productData);
-//       })
-//       .catch((error) => {
-//         console.log("Error: ", error.res.data);
-//       });
-//   };
-
-//   const increment = () => {
-//     setCount(count + 1);
-//   };
-
-//   return (
-//     <>
-//       <div className="bg-orange">
-//         <Navbar />
-//         <div className="relative border rounded-3xl bg-white w-full top-48">
-//           {/* Search Products*/}
-//           <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 pt-10">
-//             <h1 className="text-2xl">List of Products</h1>
-//             <div className="flex justify-content-end">
-//               <span className="p-input-icon-right">
-//                 <i className="pi pi-search" />
-//                 <InputText
-//                   value={filterQuery}
-//                   onChange={handleFilter}
-//                   placeholder="Keyword Search"
-//                 />
-//               </span>
-//             </div>
-//           </div>
-
-//           {/* Render products */}
-//           <div className="grid w-11/12 justify-center mx-auto pt-24">
-//             {filterData.map((item) => (
-//               <div key={item._id}>
-//                 <StoreItem {...item} />
-//               </div>
-//             ))}
-//           </div>
-
-//           {selectedProduct && showDialog && (
-//             <div>
-//               <Dialog visible={showDialog} onHide={() => setShowDialog(false)}>
-//                 {loading ? (
-//                   <div className="flex w-96 h-64">
-//                     <ProgressSpinner className="justify-center" />
-//                   </div>
-//                 ) : (
-//                   <CustomDialog
-//                     selectedProduct={selectedProduct}
-//                     loading={loading}
-//                     onClick={() => handleAddToCart(selectedProduct._id)}
-//                   />
-//                 )}
-//               </Dialog>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
