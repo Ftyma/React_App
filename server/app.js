@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const dotenv = require("dotenv");
 
 const app = express();
 
@@ -12,10 +13,12 @@ app.use(cors());
 const usersRouter = require("./routes/users");
 const cartsRouter = require("./routes/carts");
 const productsRouter = require("./routes/products");
+const ordersRouter = require("./routes/orders");
 
 app.use("/users", usersRouter);
 app.use("/carts", cartsRouter);
 app.use("/products", productsRouter);
+app.use("/orders", ordersRouter);
 
 const port = process.env.PORT || 3000;
 

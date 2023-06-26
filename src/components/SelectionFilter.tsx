@@ -1,18 +1,17 @@
 import React from "react";
-import { Button } from "primereact/button";
 
 const SelectionFilter = ({ options, filterCategory, handleClickCat }) => {
   return (
-    <div>
+    <div className="flex justify-center mt-6">
       {options.map((option, i) => (
-        <Button
+        <button
           key={i}
           value={filterCategory}
           onClick={() => handleClickCat(option.value)}
-          className=""
+          className={`px-4 bg-orange border border-black mr-1 rounded-md shadow-md hover:shadow-xl hover:scale-105`}
         >
           {option.label}
-        </Button>
+        </button>
       ))}
     </div>
   );

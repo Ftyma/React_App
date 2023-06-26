@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import ShoppingCart from "../components/ShoppingCart";
+
 import axios from "axios";
 
 type ShoppingCartProviderProps = {
@@ -17,14 +17,19 @@ type CartItem = {
   quantity: number;
 };
 
+type OrderItem = {
+  id: number;
+  quantity: number;
+};
+
 type ShoppingCartContext = {
-  openCart: () => void;
-  closeCart: () => void;
   handleAddToCart: (id: number) => void;
-  getItemQuantity: (id: number) => number;
   decreaseCartQuantity: (id: number) => void;
+  increaseCartQuantity: (id: number) => void;
+  handleSubmitOrder: () => void;
   cartQuantity: number;
   cartItems: CartItem[];
+  orderItems: OrderItem[];
   removeItem: (id: number) => void;
 };
 
@@ -35,11 +40,14 @@ export function useShoppingCart() {
 }
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
   useEffect(() => {
     fetchCart();
+  }, []);
+  useEffect(() => {
+    fetchOrder();
   }, []);
 
   const fetchCart = async () => {
@@ -47,48 +55,49 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       .get("http://localhost:3000/carts/get-carts")
       .then((res) => {
         setCartItems(res.data);
-        //calculateTotal(res.data);
       })
       .catch((err) => console.log(err));
   };
 
-  const openCart = () => {
-    setIsOpen(true);
-  };
-  const closeCart = () => {
-    setIsOpen(false);
+  const fetchOrder = async () => {
+    await axios
+      .get("http://localhost:3000/orders/getAll")
+      .then((res) => {
+        console.log("fetch from order", res.data);
+        setOrderItems(res.data);
+      })
+      .catch((err) => console.log(err));
   };
 
-  function getItemQuantity(id: number) {
-    return cartItems.find((item) => item.id === id)?.quantity || 0;
-  }
+  // function getItemQuantity(id: number) {
+  //   return cartItems.find((item) => item.id === id)?.quantity || 0;
+  // }
 
   const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
   );
 
-  function decreaseCartQuantity(id: number) {
-    setCartItems((currItems) => {
-      if (currItems.find((item) => item.id === id)?.quantity === 1) {
-        return currItems.filter((item) => item.id !== id);
-      } else {
-        return currItems.map((item) => {
-          if (item.id === id) {
-            return { ...item, quantity: item.quantity - 1 };
-          } else {
-            return item;
-          }
-        });
-      }
-    });
-  }
+  const handleSubmitOrder = () => {
+    axios
+      .post("http://localhost:3000/orders/submit")
+      .then((res) => {
+        console.log(res.data);
+        setOrderItems([...orderItems, ...cartItems]);
+        setCartItems([]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const handleAddToCart = async (productId: any) => {
     getProductById(productId)
       .then((productData) => {
-        addProductToCart(productData)
+        const quantity = 1;
+        addProductToCart(productData, quantity)
           .then(() => {
+            fetchCart();
             alert("added to cart");
           })
           .catch((error) => {
@@ -100,12 +109,46 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       });
   };
 
-  const addProductToCart = async (product: any) => {
+  const increaseCartQuantity = async (productId: any) => {
+    getCartById(productId)
+      .then((productData) => {
+        const quantity = 1;
+        addProductToCart(productData, quantity)
+          .then(() => {
+            fetchCart();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
+  const decreaseCartQuantity = async (productId: any) => {
+    getCartById(productId)
+      .then((productData) => {
+        const quantity = -1;
+        addProductToCart(productData, quantity)
+          .then(() => {
+            fetchCart();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
+  const addProductToCart = async (product: any, quantity: number) => {
     try {
-      const res = await axios.post(
-        "http://localhost:3000/carts/add-carts",
-        product
-      );
+      const res = await axios.post("http://localhost:3000/carts/add-carts", {
+        ...product,
+        quantity: quantity,
+      });
       console.log("add product to cart", res.data);
       return res.data;
     } catch (error) {
@@ -128,6 +171,20 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
     }
   };
 
+  const getCartById = async (productId: any) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/carts/get-cart/${productId}`
+      );
+      const productData = res.data;
+      console.log("cart get by ID:", productData);
+      return productData;
+    } catch (error) {
+      console.log("Error: ", error.response.data);
+      throw new Error("Failed to retrieve product.");
+    }
+  };
+
   const removeItem = async (id: number) => {
     await axios
       .delete(`http://localhost:3000/carts/delete-carts/${id}`)
@@ -143,17 +200,16 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
     <ShoppingCartContext.Provider
       value={{
         handleAddToCart,
-        getItemQuantity,
         removeItem,
         decreaseCartQuantity,
+        increaseCartQuantity,
+        handleSubmitOrder,
+        orderItems,
         cartItems,
         cartQuantity,
-        openCart,
-        closeCart,
       }}
     >
       {children}
-      <ShoppingCart isOpen={isOpen}></ShoppingCart>
     </ShoppingCartContext.Provider>
   );
 }

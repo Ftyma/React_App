@@ -42,3 +42,24 @@
   width: 100%;
   justify-content: center;
 }
+
+.sidebar-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 300px; /* Adjust the width as needed */
+  background: #fff;
+  z-index: 9999; /* Adjust the z-index as needed */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  transition: transform 0.3s ease-out;
+}
+
+.sidebar-dialog.dialog-visible {
+  transform: translateX(0);
+}
+
+.sidebar-dialog.dialog-hidden {
+  transform: translateX(-100%);
+}

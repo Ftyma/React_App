@@ -23,7 +23,7 @@ export default function Login() {
   let navigate = useNavigate();
 
   const goProductPage = () => {
-    navigate("/product");
+    navigate("/store");
   };
 
   const authentication = (data: any) => {
@@ -80,6 +80,12 @@ export default function Login() {
 
         return;
       }
+
+      setPostUsers({
+        username: "",
+        email: "",
+        password: "",
+      });
 
       console.log(data);
       setLoading(true);

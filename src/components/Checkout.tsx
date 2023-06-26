@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import custom from "../css/Products.module.css";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ export function Checkout() {
           Checkout
           <div className="flex flex-row ml-3 px-3 items-center bg-amber-300 rounded-xl bg-opacity-30">
             <i className="pi pi-shopping-cart pr-2"></i>
-            <p>{cartQuantity}</p>
+            {cartQuantity}
           </div>
         </Button>
       </div>

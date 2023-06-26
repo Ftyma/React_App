@@ -6,8 +6,14 @@ const Product = require("../models/productModel");
 // Get all carts
 router.get("/get-carts", async (req, res) => {
   try {
-    const carts = await Cart.find({});
-    res.status(200).json(carts);
+    const carts = await Cart.find();
+    const cartIds = carts.map((cart) => cart.id); //get Id of item in carts
+    const products = await Product.find({ id: { $in: cartIds } });
+
+    const filterCart = carts.filter((cart) => {
+      return products.some((product) => product.id === cart.id);
+    });
+    res.status(200).json(filterCart);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -29,40 +35,73 @@ router.get("/get-cart/:id", async (req, res) => {
   }
 });
 
-//Create a new cart
+//push item to Orders db & remove all data from cart db
+
+// Create a new cart or update the existing cart item
 router.post("/add-carts", async (req, res) => {
   const productId = req.body.id;
-
-  const updateObject = {
-    $inc: { quantity: 1 },
-    $set: {
-      sku: req.body.sku,
-      product_name: req.body.product_name,
-      description: req.body.description,
-      price: req.body.price,
-      image: req.body.image,
-      group_id: req.body.group_id,
-      category: req.body.category,
-    },
-  };
+  const quantityChange = req.body.quantity;
 
   try {
-    const updatedCartItems = await Cart.findOneAndUpdate(
-      { id: productId },
-      updateObject,
-      { upsert: true, new: true }
-    );
+    const cartItem = await Cart.findOne({ id: productId });
 
-    if (updatedCartItems) {
-      console.log(updatedCartItems);
+    if (cartItem) {
+      // Cart item exists, update the quantity
+      cartItem.quantity += quantityChange;
+      await cartItem.save();
       res.json({ message: "Quantity updated successfully!" });
     } else {
+      // Cart item doesn't exist, create a new one
+      const newCartItem = new Cart({
+        id: productId,
+        quantity: quantityChange,
+        product_name: req.body.product_name,
+        price: req.body.price,
+        image: req.body.image,
+      });
+      await newCartItem.save();
       res.json({ message: "Product added to cart!" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
+//Create a new cart
+// router.post("/add-carts", async (req, res) => {
+//   const productId = req.body.id;
+//   const quantityChange = req.body.quantity;
+
+//   const updateObject = {
+//     $inc: { quantity: quantityChange },
+//     $set: {
+//       sku: req.body.sku,
+//       product_name: req.body.product_name,
+//       description: req.body.description,
+//       price: req.body.price,
+//       image: req.body.image,
+//       group_id: req.body.group_id,
+//       category: req.body.category,
+//     },
+//   };
+
+//   try {
+//     const updatedCartItems = await Cart.findOneAndUpdate(
+//       { id: productId },
+//       updateObject,
+//       { upsert: true, new: true }
+//     );
+
+//     if (updatedCartItems) {
+//       console.log(updatedCartItems);
+//       res.json({ message: "Quantity updated successfully!" });
+//     } else {
+//       res.json({ message: "Product added to cart!" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 router.delete("/delete-carts/:id", async (req, res) => {
   try {

@@ -26,7 +26,7 @@ export default function Login() {
 
   let navigate = useNavigate();
   const goProductPage = () => {
-    navigate("/product");
+    navigate("/store");
   };
 
   const formik = useFormik<any>({

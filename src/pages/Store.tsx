@@ -3,9 +3,9 @@ import axios from "axios";
 import { StoreItem } from "../components/StoreItem";
 import { InputText } from "primereact/inputtext";
 import { ProgressSpinner } from "primereact/progressspinner";
-import Navbar from "../components/Navbar";
 import SelectionFilter from "../components/SelectionFilter";
 import { Checkout } from "../components/Checkout";
+import Navbar from "../components/Navbar";
 
 export default function Store() {
   const [productAll, setProductAll] = useState([]);
@@ -16,7 +16,7 @@ export default function Store() {
   const [loading, setLoading] = useState(true);
 
   const options = [
-    { label: "all", value: 0 },
+    { label: "All", value: 0 },
     { label: "Category 1", value: 1 },
     { label: "Category 2", value: 2 },
     { label: "Category 3", value: 3 },
@@ -29,19 +29,19 @@ export default function Store() {
   }, []);
 
   useEffect(() => {
-    // do function filter item
-    filterProduct();
-  }, [filterQuery, filterCategory]);
+    if (!loading) {
+      filterProduct();
+    }
+  }, [filterQuery, filterCategory, loading]);
 
   const fetchProduct = async () => {
     try {
       const res = await axios.get("http://localhost:3000/products");
       setProductAll(res.data);
-      console.log("fetched products ", res.data);
+      console.log("fetched all products ", res.data);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching products ", error);
-    } finally {
-      setLoading(false); // Set loading to false regardless of success or error
+      console.error("Error fetching all products ", error);
     }
   };
 
@@ -79,42 +79,6 @@ export default function Store() {
 
     console.log("filter data", filter);
     setFilterData(filter);
-  };
-
-  const handleAddToCart = (productId: any) => {
-    increment();
-    getProductById(productId);
-  };
-
-  const addProductToCart = (product: any) => {
-    axios
-      .post("http://localhost:3000/carts/add-carts", product)
-      .then((res) => {
-        console.log("add product to cart", res.data);
-        alert("Added to cart!");
-      })
-      .catch((error) => {
-        alert("Failed to add to cart. Please try again.");
-        console.log("error adding product to cart: ", error);
-      });
-  };
-
-  //get selected product ID and push it to addProductToCart
-  const getProductById = (productId: any) => {
-    axios
-      .get(`http://localhost:3000/products/${productId}`)
-      .then((res) => {
-        const productData = res.data;
-        console.log("product get by ID:", productData);
-        addProductToCart(productData);
-      })
-      .catch((error) => {
-        console.log("Error: ", error.res.data);
-      });
-  };
-
-  const increment = () => {
-    setCount(count + 1);
   };
 
   return (

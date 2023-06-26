@@ -21,9 +21,7 @@ type StoreItemProps = {
 export function StoreItem({ product }: StoreItemProps) {
   const [showDialog, setShowDialog] = useState(false);
 
-  const { getItemQuantity, handleAddToCart, cartQuantity } = useShoppingCart();
-
-  const quantity = getItemQuantity(product.id);
+  const { handleAddToCart } = useShoppingCart();
 
   const handleImageClick = () => {
     setShowDialog(true);
@@ -31,12 +29,6 @@ export function StoreItem({ product }: StoreItemProps) {
 
   const handleCloseDialog = () => {
     setShowDialog(false);
-  };
-
-  const addToCart = () => {
-    console.log(product.id);
-    handleAddToCart(product.id);
-    handleCloseDialog();
   };
 
   return (
