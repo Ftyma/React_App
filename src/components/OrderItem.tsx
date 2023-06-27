@@ -1,6 +1,8 @@
+import { Button } from "primereact/button";
 import React from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import { Currency } from "../pages/Currency";
+import custom from "../css/Cart.module.css";
 
 function OrderItem({ orderId, onClose }) {
   const { orderItems } = useShoppingCart();
@@ -20,16 +22,19 @@ function OrderItem({ orderId, onClose }) {
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50" onClick={goBack} />
 
-      <div className="fixed bg-white inset-0 w-screen h-screen items-center justify-center z-10">
-        <div className="bg-orange justify-between items-center mb-4 h-40">
-          <button className="border bg-white" onClick={goBack}>
-            Go Back
-          </button>
-          <h1 className="text-lg text-center font-semibold">Order Receipt</h1>
-          <div className="w-8" /> {/* Spacer for button alignment */}
+      <div className="fixed bg-white inset-0 w-screen h-screen items-center justify-center z-10 ">
+        <div className="bg-orange h-40">
+          <Button
+            icon="pi pi-chevron-left"
+            className={`p-button-rounded p-button-circle ml-3 mt-3 ${custom.backBtn}`}
+            onClick={goBack}
+          />
+          <h1 className="text-xl text-center font-semibold text-white">
+            Order Details
+          </h1>
         </div>
         <div className="flex justify-center">
-          <div className="bg-white w-10/12 border rounded-3xl p-6 fixed top-24">
+          <div className="bg-white w-10/12 md:w-8/12 h-full border rounded-3xl p-6 fixed top-24 overflow-y-auto">
             <div className="pb-4">
               <div className="flex">
                 <p>Order Number:</p>
@@ -60,10 +65,12 @@ function OrderItem({ orderId, onClose }) {
                 </>
               );
             })}
-            <div className="font-semibold text-lg flex justify-between mt-3">
+            <div className="font-semibold text-lg flex justify-between mt-3 mb-16">
               <h1>Total: </h1>
               <h1 className="text-orange">{Currency(total)}</h1>
             </div>
+            <br />
+            <br />
           </div>
         </div>
       </div>

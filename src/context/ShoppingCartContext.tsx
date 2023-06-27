@@ -27,6 +27,7 @@ type ShoppingCartContext = {
   decreaseCartQuantity: (id: number) => void;
   increaseCartQuantity: (id: number) => void;
   handleSubmitOrder: () => void;
+  handleChange: (e: any, id: number) => void;
   cartQuantity: number;
   cartItems: CartItem[];
   orderItems: OrderItem[];
@@ -103,6 +104,36 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
           .catch((error) => {
             alert(error.message);
           });
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
+  const handleChange = async (e, productId: any) => {
+    const newQuantity = parseInt(e.value);
+
+    getCartById(productId)
+      .then((productData) => {
+        const quantityDiff = newQuantity - productData.quantity;
+
+        if (isNaN(quantityDiff)) {
+          addProductToCart(productData, -productData.quantity)
+            .then(() => {
+              fetchCart();
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        } else {
+          addProductToCart(productData, quantityDiff)
+            .then(() => {
+              fetchCart();
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+        }
       })
       .catch((error) => {
         alert(error.message);
@@ -204,6 +235,8 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
         decreaseCartQuantity,
         increaseCartQuantity,
         handleSubmitOrder,
+
+        handleChange,
         orderItems,
         cartItems,
         cartQuantity,

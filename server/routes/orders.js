@@ -26,6 +26,7 @@ router.post("/submit", async (req, res) => {
       product_name: item.product_name,
       price: item.price,
       quantity: item.quantity,
+      description: item.description,
     }));
 
     const order = new Order({

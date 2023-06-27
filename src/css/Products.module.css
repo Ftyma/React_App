@@ -63,3 +63,8 @@
 .sidebar-dialog.dialog-hidden {
   transform: translateX(-100%);
 }
+
+.inputBox .p-inputtext {
+  width: 1rem !important;
+  background-color: #f16f22 !important;
+}

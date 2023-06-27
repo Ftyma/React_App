@@ -4,6 +4,10 @@ import { Currency } from "./Currency";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import Navbar from "../components/Navbar";
 
+import { InputNumber } from "primereact/inputnumber";
+import custom from "../css/Cart.module.css";
+import { Button } from "primereact/button";
+
 const Cart = () => {
   const {
     cartItems,
@@ -11,6 +15,7 @@ const Cart = () => {
     increaseCartQuantity,
     decreaseCartQuantity,
     handleSubmitOrder,
+    handleChange,
   } = useShoppingCart();
 
   const totalPrice = () => {
@@ -36,45 +41,55 @@ const Cart = () => {
             key={item._id}
             className="grid border rounded-xl my-4 w-10/12 mx-auto"
           >
-            <img src={item.image} className="col-4 md:col-4 w-2 h-13" />
-            <div className="col-4 md:col-4 m-auto ">
+            <img src={item.image} className="col-3 md:col-3 w-2 h-13" />
+            <div className="col-3 md:col-3 m-auto ">
               <h1 className="text-lg font-medium">{item.product_name}</h1>
               <h1 className="text-md">{item.description}</h1>
             </div>
 
-            <div className="flex col-3 md:col-2 m-auto ">
-              <button
-                onClick={() => decreaseCartQuantity(item._id)}
-                className="m-auto rounded-full border px-3 py-2"
-              >
-                -
-              </button>
+            <div className="col-4 md:col-3 m-auto">
+              <div className="grid ">
+                <div className="col-4 md:col-3">
+                  <Button
+                    icon="pi pi-minus"
+                    onClick={() => decreaseCartQuantity(item._id)}
+                    className={`p-button-rounded p-button-circle ${custom.addBtn}`}
+                  />
+                </div>
 
-              <p className="px-2 pt-2 m-auto">{item.quantity}</p>
+                <div className="col-4 md:col-3">
+                  <InputNumber
+                    min={1}
+                    value={item.quantity}
+                    inputClassName={`w-10 text-center h-10 my-auto`}
+                    onValueChange={(e) => handleChange(e, item._id)}
+                  />
+                </div>
 
-              <button
-                onClick={() => increaseCartQuantity(item._id)}
-                className="m-auto rounded-full border px-3 py-2"
-              >
-                +
-              </button>
+                <div className="col-4 md:col-3">
+                  <Button
+                    icon="pi pi-plus"
+                    onClick={() => increaseCartQuantity(item._id)}
+                    className={`p-button-rounded p-button-circle ${custom.addBtn}`}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="col-3 md:col-3 m-auto">
+            <div className="col-2 md:col-2 m-auto">
               <h1 className="text-center">{Currency(item.price)}</h1>
-              <button
-                className="flex text-red-600 underline m-auto"
-                onClick={() => removeItem(item._id)}
-              >
-                Remove
-              </button>
             </div>
+            <Button
+              icon="pi pi-trash"
+              className={`mx-auto p-button-rounded p-button-circle ${custom.removeBtn} `}
+              onClick={() => removeItem(item._id)}
+            />
           </div>
         ))}
 
-        <div className="flex flex-col border py-4 shadow-2xl w-full mt-16">
+        <div className="fixed bottom-0 bg-white flex flex-col border py-4 shadow-2xl w-full mt-16">
           <p className="text-xl font-semibold mx-auto">
-            Total: <span className="mx-5">{Currency(totalPrice())} </span>
+            Total: <span className="mx-24">{Currency(totalPrice())} </span>
           </p>
           <button
             onClick={handleSubmitOrder}

@@ -56,6 +56,7 @@ router.post("/add-carts", async (req, res) => {
         id: productId,
         quantity: quantityChange,
         product_name: req.body.product_name,
+        description: req.body.description,
         price: req.body.price,
         image: req.body.image,
       });

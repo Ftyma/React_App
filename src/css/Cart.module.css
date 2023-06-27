@@ -1,0 +1,28 @@
+.inputBox .p-inputnumber {
+  width: 1rem;
+}
+
+.removeBtn {
+  width: 30px !important;
+  height: 30px !important;
+  color: black !important;
+  background-color: white !important;
+  border-color: white !important;
+}
+
+.addBtn {
+  width: 40px !important;
+  height: 40px !important;
+  background-color: #f16f22 !important;
+  border-color: #f16f22 !important;
+  scale: 90%;
+}
+
+/* orderItem */
+.backBtn {
+  width: 30px !important;
+  height: 30px !important;
+  background-color: black !important;
+  border-color: black !important;
+  opacity: 40%;
+}
