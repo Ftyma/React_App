@@ -18,6 +18,11 @@ const Cart = () => {
     handleChange,
   } = useShoppingCart();
 
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      removeItem(id);
+    }
+  };
   const totalPrice = () => {
     try {
       let total: number = 0;
@@ -33,7 +38,7 @@ const Cart = () => {
   return (
     <div className="bg-orange h-screen">
       <Navbar />
-      <div className="bg-white h-full rounded-3xl relative top-52">
+      <div className="bg-white h-full rounded-3xl relative top-52  overflow-y-auto">
         <br />
         <h1 className="text-3xl text-left ml-7 mt-4">Shopping Cart</h1>
         {cartItems.map((item) => (
@@ -59,8 +64,8 @@ const Cart = () => {
 
                 <div className="col-4 md:col-3">
                   <InputNumber
-                    min={1}
                     value={item.quantity}
+                    min={1}
                     inputClassName={`w-10 text-center h-10 my-auto`}
                     onValueChange={(e) => handleChange(e, item._id)}
                   />
@@ -82,7 +87,7 @@ const Cart = () => {
             <Button
               icon="pi pi-trash"
               className={`mx-auto p-button-rounded p-button-circle ${custom.removeBtn} `}
-              onClick={() => removeItem(item._id)}
+              onClick={() => handleDelete(item._id)}
             />
           </div>
         ))}

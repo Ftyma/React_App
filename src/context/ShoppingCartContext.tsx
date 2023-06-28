@@ -112,7 +112,6 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
   const handleChange = async (e, productId: any) => {
     const newQuantity = parseInt(e.value);
-
     getCartById(productId)
       .then((productData) => {
         const quantityDiff = newQuantity - productData.quantity;
@@ -160,6 +159,14 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const decreaseCartQuantity = async (productId: any) => {
     getCartById(productId)
       .then((productData) => {
+        if (productData.quantity === 1) {
+          if (window.confirm("Are you sure you want to remove this item?")) {
+            removeItem(productId);
+          } else {
+            productData.quantity = 1;
+            return;
+          }
+        }
         const quantity = -1;
         addProductToCart(productData, quantity)
           .then(() => {
@@ -235,7 +242,6 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
         decreaseCartQuantity,
         increaseCartQuantity,
         handleSubmitOrder,
-
         handleChange,
         orderItems,
         cartItems,

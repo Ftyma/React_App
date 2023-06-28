@@ -35,8 +35,6 @@ router.get("/get-cart/:id", async (req, res) => {
   }
 });
 
-//push item to Orders db & remove all data from cart db
-
 // Create a new cart or update the existing cart item
 router.post("/add-carts", async (req, res) => {
   const productId = req.body.id;

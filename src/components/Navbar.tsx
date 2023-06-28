@@ -1,12 +1,8 @@
 import React from "react";
 import logo from "../assets/logo.svg";
-import { useShoppingCart } from "../context/ShoppingCartContext";
 import Sidebar from "../pages/Sidebar";
-import { Button } from "primereact/button";
 
 export default function Navbar() {
-  const { openCart, cartQuantity } = useShoppingCart();
-
   return (
     <>
       <div className="fixed bg-orange w-full z-2">
