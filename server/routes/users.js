@@ -87,4 +87,28 @@ router.delete("/deleteUser/:id", async (req, res) => {
   }
 });
 
+//update a user
+router.put("/updateUser/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateUser = await Users.findByIdAndUpdate(
+      id,
+      {
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+      },
+      {
+        new: true,
+      }
+    );
+    if (!updateUser) {
+      return res.status(404).json({ message: `user not found with ID ${id}` });
+    }
+    res.status(200).json(updateUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;
