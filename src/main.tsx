@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
+import App from "./App";
 import "./index.css";
 
 import "primereact/resources/themes/lara-light-indigo/theme.css"; //theme
@@ -9,9 +9,5 @@ import "primeicons/primeicons.css"; //icons
 import "primeflex/primeflex.css";
 import { BrowserRouter } from "react-router-dom";
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <App />
 );

@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Cart = require("../models/cartModel");
 const Product = require("../models/productModel");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 // Get all carts
 router.get("/get-carts", async (req, res) => {
+  const uid = req.query.uid;
+
   try {
-    const carts = await Cart.find();
+    const carts = await Cart.find({ uid: uid });
     const cartIds = carts.map((cart) => cart.id); //get Id of item in carts
     const products = await Product.find({ id: { $in: cartIds } });
 
@@ -20,7 +23,7 @@ router.get("/get-carts", async (req, res) => {
 });
 
 //get by id
-router.get("/get-cart/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const cart = await Cart.findById(id);
@@ -53,13 +56,15 @@ router.post("/add-carts", async (req, res) => {
       const newCartItem = new Cart({
         id: productId,
         quantity: quantityChange,
+        uid: req.body.uid,
         product_name: req.body.product_name,
         description: req.body.description,
         price: req.body.price,
         image: req.body.image,
       });
       await newCartItem.save();
-      res.json({ message: "Product added to cart!" });
+      res.status(200).json(newCartItem);
+      // res.json({ message: "Product added to cart!" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

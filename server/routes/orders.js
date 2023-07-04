@@ -1,11 +1,13 @@
 const express = require("express");
+const { authMiddleware } = require("../middlewares/authMiddleware");
 const router = express.Router();
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
 
 //get all Order item
-router.get("/getAll", async (req, res) => {
-  Order.find()
+router.get("/", async (req, res) => {
+  const uid = req.query.uid;
+  Order.find({ uid: uid })
     .then((orders) => res.json(orders))
     .catch((err) => {
       console.log("Error:", err);
@@ -15,8 +17,9 @@ router.get("/getAll", async (req, res) => {
 
 //push and delete all data from Cart to Order db
 router.post("/submit", async (req, res) => {
+  const uid = req.body.uid;
   try {
-    const carts = await Cart.find();
+    const carts = await Cart.find({ uid: uid });
     if (carts.length === 0) {
       res.status(400).json({ message: "no products in carts" });
     }
@@ -33,6 +36,7 @@ router.post("/submit", async (req, res) => {
       status: "Not Processed",
       orders: orderItems,
       date: new Date(),
+      uid: uid,
     });
 
     order

@@ -11,6 +11,10 @@ const orderSchema = mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    uid: {
+      type: String,
+      ref: "Users",
+    },
     orders: [
       {
         id: {

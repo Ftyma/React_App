@@ -3,9 +3,10 @@ const router = express.Router();
 const Users = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../config/jwtToken");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 router.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const { uid, username, email, password } = req.body;
 
   try {
     //check existing users
@@ -21,6 +22,7 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const user = await Users.create({
+      uid,
       username,
       email,
       password: hashedPassword,
@@ -51,7 +53,7 @@ router.post("/signin", async (req, res) => {
     }
 
     return res.status(200).json({
-      _id: user?._id,
+      uid: user?.uid,
       username: user?.username,
       email: user?.email,
       password: user?.password,
@@ -64,6 +66,18 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+//sign-out
+
+router.get("/getById", async (req, res) => {
+  const uid = req.query.uid;
+  Users.find({ uid: uid })
+    .then((orders) => res.json(orders))
+    .catch((err) => {
+      console.log("Error:", err);
+      res.status(400).json("Error fetching order");
+    });
+});
+
 ///get all user
 router.get("/getAll", async (req, res) => {
   try {
@@ -71,6 +85,22 @@ router.get("/getAll", async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     throw new Error(error);
+  }
+});
+
+// Get a user
+router.get("/:id", authMiddleware, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Users.findById(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: `Product not found with ID ${id}` });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -94,9 +124,10 @@ router.put("/updateUser/:id", async (req, res) => {
     const updateUser = await Users.findByIdAndUpdate(
       id,
       {
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
+        username: req?.body?.username,
+        email: req?.body?.email,
+        password: req?.body?.password,
+        role: req?.body?.role,
       },
       {
         new: true,

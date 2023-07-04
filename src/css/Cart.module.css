@@ -8,6 +8,9 @@
   color: black !important;
   background-color: white !important;
   border-color: white !important;
+  position: relative !important;
+  left: 95% !important;
+  top: 10px;
 }
 
 .addBtn {
@@ -25,4 +28,23 @@
   background-color: black !important;
   border-color: black !important;
   opacity: 40%;
+}
+
+@media (max-width: 360px) {
+  .removeBtn {
+    left: 89% !important;
+  }
+
+  .addBtn {
+    width: 30px !important;
+    height: 30px !important;
+    margin: auto !important;
+  }
+
+  .productText {
+    line-height: 1.5em;
+    height: 3em; /* height is 2x line-height, so two lines will display */
+    overflow: hidden;
+    width: 100px;
+  }
 }

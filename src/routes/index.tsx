@@ -1,58 +1,67 @@
-// import React from "react";
-// import { createBrowserRouter, Route, Routes } from "react-router-dom";
-// import Cart from "../pages/Cart";
-// import Login from "../pages/Login";
+import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 
-// import Product from "../pages/Product";
-// import Register from "../pages/Register";
-// import Store from "../pages/Store";
-// import Test from "../pages/Test";
-// import Navbar from "../components/Navbar";
-// import { ShoppingCartProvider } from "../context/ShoppingCartContext";
+import { LayoutMain } from "../Layout/index";
+import Store from "../pages/Store";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import Cart from "../pages/Cart";
+import React from "react";
+import Order from "../pages/Order";
+import Page404 from "../pages/Page404";
+const Middleware = ({ children }: { children: JSX.Element }) => {
+  const location = useLocation();
+  const uid = localStorage.getItem("uid");
+  const token = localStorage.getItem("token");
 
-// function Router() {
-//   return (
-//     <ShoppingCartProvider>
-//       <Routes>
-//         <Route path="login" element={<Login />} />
-//         <Route path="register" element={<Register />} />
-//         <Route path="product" element={<Product />} />
-//         <Route path="cart" element={<Cart />} />
-//         <Route path="test" element={<Test />} />
-//         <Route path="store" element={<Store />} />
-//       </Routes>
-//     </ShoppingCartProvider>
-//   );
-// }
-
-// const Router = createBrowserRouter([
-//   {
-//     path: "login",
-//     element: <Login />,
-//   },
-//   {
-//     path: "register",
-//     element: <Register />,
-//   },
-//   {
-//     path: "product",
-//     element: <Product />,
-//   },
-//   {
-//     path: "cart",
-//     element: <Cart />,
-//   },
-//   {
-//     path: "test",
-//     element: <Test />,
-//   },
-//   {
-//     path: "store",
-//     element: <Store />,
-//   },
-//   {
-//     path: "navbar",
-//     element: <Navbar />,
-//   },
-// ]);
-// export default Router;
+  if (uid && token) {
+    return children;
+  } else {
+    return <Navigate to="/404" state={{ from: location }} replace />;
+  }
+};
+const Router = createBrowserRouter([
+  {
+    path: "/",
+    element: <LayoutMain />,
+    errorElement: <LayoutMain />,
+    children: [
+      {
+        path: "/cart",
+        element: (
+          <Middleware>
+            <Cart />
+          </Middleware>
+        ),
+      },
+      {
+        path: "/store",
+        element: (
+          <Middleware>
+            <Store />
+          </Middleware>
+        ),
+      },
+      {
+        path: "/order",
+        element: (
+          <Middleware>
+            <Order />
+          </Middleware>
+        ),
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/404",
+        element: <Page404 />,
+      },
+    ],
+  },
+]);
+export default Router;

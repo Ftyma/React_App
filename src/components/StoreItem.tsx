@@ -1,53 +1,140 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import custom from "../css/Products.module.css";
+import axios from "axios";
 
-import { Currency } from "../pages/Currency";
+import { Currency } from "./Currency";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { useShoppingCart } from "../context/ShoppingCartContext";
+import { InputNumber } from "primereact/inputnumber";
+import customCart from "../css/Cart.module.css";
 
 type StoreItemProps = {
   product: {
-    id: string;
+    id: number;
     product_name: string;
     description: string;
     price: number;
     image: string;
+    _id: string;
   };
 };
 
 export function StoreItem({ product }: StoreItemProps) {
+  const { handleProdChange, cartItems, setCartItems } = useShoppingCart();
   const [showDialog, setShowDialog] = useState(false);
 
-  const { handleAddToCart } = useShoppingCart();
+  const [productId, setProductId] = useState<number>();
+  const [productName, setProductName] = useState<string>();
+  const [productDesc, setProductDesc] = useState<string>();
+  const [productPrice, setProductPrice] = useState<number>(0);
+  const [productImg, setProductImg] = useState<string>();
+  const [productQty, setProductQty] = useState<number>(1);
 
-  const handleImageClick = () => {
+  const selectProduct = (
+    id: number,
+    name: string,
+    desc: string,
+    price: number,
+    img: string,
+    quantity: number
+  ) => {
+    setProductId(id);
+    setProductName(name);
+    setProductDesc(desc);
+    setProductPrice(price);
+    setProductImg(img);
+    setProductQty(quantity);
     setShowDialog(true);
   };
 
+  const showPopup = () => {
+    setShowDialog(true);
+  };
   const handleCloseDialog = () => {
     setShowDialog(false);
+  };
+
+  const increaseQty = () => {
+    setProductQty((prevQty) => prevQty + 1);
+  };
+
+  const decreaseQty = () => {
+    if (productQty !== 1) {
+      setProductQty((prevQty) => prevQty - 1);
+    }
+  };
+
+  const handleAdd = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const uid = localStorage.getItem("uid");
+
+      //check if token and uid exist in local storage
+      if (!token || !uid) {
+        throw new Error("Token or UID is missing.");
+      }
+
+      const newCart = {
+        id: productId,
+        product_name: productName,
+        price: productPrice,
+        image: productImg,
+        description: productDesc,
+        quantity: productQty,
+        uid: uid,
+      };
+
+      const res = await axios.post(
+        "http://localhost:3000/carts/add-carts",
+        newCart,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, //include token in req header
+          },
+        }
+      );
+      const updateCart = [...cartItems, newCart];
+
+      alert("Added to cart!");
+      console.log(updateCart);
+      setShowDialog(false);
+      setCartItems(updateCart);
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
   };
 
   return (
     <>
       <div className="col-3 md:col-3 lg:col-3">
         <Card
-          className="border rounded-2xl"
-          style={{ width: "350px", height: "450px" }}
+          className="border rounded-2xl xs:w-80 "
+          // style={{ width: "350px", height: "450px" }}
         >
           <img
             src={product.image}
-            onClick={handleImageClick}
-            className="w-48 h-48 mx-auto"
+            onClick={() =>
+              selectProduct(
+                product.id,
+                product.product_name,
+                product.description,
+                product.price,
+                product.image,
+                productQty
+              )
+            }
+            className="xs:w-40 md:w-48 md:h-48 mx-auto"
           />
 
-          <h1 className={`text-xl ${custom.productText}`}>
+          <h1
+            className={`xs:text-lg md:text-xl  font-semibold  ${custom.productText}`}
+          >
             {product.product_name}
           </h1>
-          <h1 className="">{product.description}</h1>
+          <h1 className="xs:text-md md:text-lg">{product.description}</h1>
 
           <br />
           <div className="flex justify-between">
@@ -61,31 +148,60 @@ export function StoreItem({ product }: StoreItemProps) {
             <Button
               className={`${custom.productAddButton}`}
               icon="pi pi-plus"
-              onClick={() => handleAddToCart(product._id)}
+              onClick={showPopup}
             ></Button>
           </div>
 
           {showDialog && (
             <Dialog visible={showDialog} onHide={handleCloseDialog}>
-              <div className="grid">
-                <div className="col-6 md:col-6">
-                  <img src={product.image} className="w-52 mx-auto" />
-                </div>
-                <Card className={`col-6 md:col-6 border ${custom.popupCard}`}>
-                  <p className="text-lg">{product.product_name}</p>
-                  <p>{product.description}</p>
-                  <br />
-                  <p className={`text-lg text-orange`}>
-                    {Currency(product.price)}
-                  </p>
-                  <p className="opacity-50 line-through">
-                    {Currency(product.price)}
-                  </p>
+              <div className="grid w-72 text-center pt-0">
+                <Card
+                  className={`col-12 md:col-12 border pt-0 ${custom.popupCard}`}
+                >
+                  <div>
+                    <p className="text-lg">{product.product_name}</p>
+                    <p className="font-semibold">{product.description}</p>
+                    <br />
+                    <p className={`text-lg text-orange font-semibold`}>
+                      {Currency(product.price)}
+                    </p>
+                  </div>
+
+                  <div className="w-full h-0.5 bg-black opacity-30 mt-3" />
                 </Card>
               </div>
+
+              <div className="grid w-64 justify-center mx-auto">
+                <div className="col-4 md:col-4">
+                  <Button
+                    icon="pi pi-minus"
+                    onClick={() => decreaseQty()}
+                    className={`p-button-rounded p-button-circle ${customCart.addBtn}`}
+                  />
+                </div>
+
+                <div className="col-4 md:col-4">
+                  <InputNumber
+                    value={productQty}
+                    min={1}
+                    inputClassName={`w-5 text-center h-10`}
+                    onValueChange={(e) => handleProdChange(e, product._id)}
+                  />
+                </div>
+
+                <div className="col-4 md:col-4">
+                  <Button
+                    icon="pi pi-plus"
+                    onClick={() => increaseQty()}
+                    className={`p-button-rounded p-button-circle ml-5 ${customCart.addBtn}`}
+                  />
+                </div>
+              </div>
+
               <Button
-                icon="pi pi-plus"
-                onClick={() => handleAddToCart(product._id)}
+                onClick={() => {
+                  handleAdd();
+                }}
                 className={`${custom.popupButton}`}
               >
                 Add to Cart

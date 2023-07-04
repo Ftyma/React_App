@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/productModel");
+const mongoose = require("mongoose");
 
 // Get all products
 router.get("/", async (req, res) => {
@@ -16,6 +17,9 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid ObjectId: " + id);
+    }
     const product = await Product.findById(id);
     if (!product) {
       return res

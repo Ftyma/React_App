@@ -34,3 +34,10 @@
   left: 0;
   transition: 450ms;
 }
+
+.menuBtn {
+  background-color: #f16f22 !important;
+  color: white !important;
+  border-color: white !important;
+  border-radius: 1rem !important;
+}

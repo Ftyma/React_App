@@ -15,6 +15,7 @@ const cartsRouter = require("./routes/carts");
 const productsRouter = require("./routes/products");
 const ordersRouter = require("./routes/orders");
 
+require("dotenv").config();
 app.use("/users", usersRouter);
 app.use("/carts", cartsRouter);
 app.use("/products", productsRouter);

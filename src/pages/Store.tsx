@@ -15,15 +15,6 @@ export default function Store() {
 
   const [loading, setLoading] = useState(true);
 
-  const options = [
-    { label: "All", value: 0 },
-    { label: "Category 1", value: 1 },
-    { label: "Category 2", value: 2 },
-    { label: "Category 3", value: 3 },
-    { label: "Category 4", value: 4 },
-    { label: "Category 5", value: 5 },
-  ];
-
   useEffect(() => {
     fetchProduct();
   }, []);
@@ -83,12 +74,12 @@ export default function Store() {
 
   return (
     <>
-      <div className="bg-orange">
+      <div className="bg-orange w-screen md:w-screen sm:w-screen">
         <Navbar />
         <div className="relative border rounded-3xl bg-white w-full top-48">
           {/* Search Products*/}
           <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 pt-10">
-            <h1 className="text-2xl">List of Products</h1>
+            <h1 className="md:text-2xl xs:text-lg">List of Products</h1>
             <div className="flex justify-content-end">
               <span className="p-input-icon-right">
                 <i className="pi pi-search" />
@@ -101,8 +92,8 @@ export default function Store() {
             </div>
           </div>
 
+          {/* Cateogry filter */}
           <SelectionFilter
-            options={options}
             filterCategory={filterCategory}
             handleClickCat={handleClickCat}
           />
@@ -110,7 +101,7 @@ export default function Store() {
           {loading ? (
             <ProgressSpinner className="justify-center" />
           ) : (
-            <div className="grid w-11/12 justify-center mx-auto pt-24">
+            <div className="grid w-11/12 justify-center mx-auto pt-16">
               {filterData.map((item) => (
                 <div key={item.id}>
                   <StoreItem product={item} />

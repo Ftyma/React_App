@@ -1,12 +1,42 @@
 import { Button } from "primereact/button";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useShoppingCart } from "../context/ShoppingCartContext";
-import { Currency } from "../pages/Currency";
+import { Currency } from "./Currency";
 import custom from "../css/Cart.module.css";
+import axios from "axios";
 
 function OrderItem({ orderId, onClose }) {
-  const { orderItems } = useShoppingCart();
-  const selectedOrder = orderItems.find((item) => item._id === orderId);
+  const [order, setOrder] = useState([]);
+
+  useEffect(() => {
+    fetchOrder();
+  }, []);
+
+  const fetchOrder = async () => {
+    const token = localStorage.getItem("token");
+    const uid = localStorage.getItem("uid");
+
+    // Check if token exists in local storage
+    if (!token || !uid) {
+      throw new Error("Token or UID is missing.");
+    }
+
+    await axios
+      .get(`http://localhost:3000/orders?uid=${uid}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log("fetch from order", res.data);
+        setOrder(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const selectedOrder = order.find((item) => item._id === orderId);
+  console.log("select order", selectedOrder);
+  console.log(orderId);
 
   const goBack = () => {
     onClose();
@@ -15,6 +45,8 @@ function OrderItem({ orderId, onClose }) {
   if (!selectedOrder) {
     return null;
   }
+  console.log(selectedOrder);
+  console.log("Render dialog:", selectedOrder);
 
   let total: number = 0;
 
@@ -36,9 +68,9 @@ function OrderItem({ orderId, onClose }) {
         <div className="flex justify-center">
           <div className="bg-white w-10/12 md:w-8/12 h-full border rounded-3xl p-6 fixed top-24 overflow-y-auto">
             <div className="pb-4">
-              <div className="flex">
+              <div className="flex  xs:flex-col md:flex-row">
                 <p>Order Number:</p>
-                <p className="font-semibold ml-2">{selectedOrder._id}</p>
+                <p className="font-semibold md:ml-2 ">{selectedOrder._id}</p>
               </div>
               <div className="flex">
                 <p>Status:</p>

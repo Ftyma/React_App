@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import logo from "../assets/logo.svg";
 import footerImg from "../assets/footer.svg";
 import { FormikErrors, useFormik } from "formik";
@@ -10,11 +10,6 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import axios, { AxiosError } from "axios";
-
-type LoginForm = {
-  name: String;
-  password: String;
-};
 
 export default function Login() {
   const [formError, setFormError] = useState(false);
@@ -57,6 +52,13 @@ export default function Login() {
             password: data.password,
           }
         );
+
+        const { token } = response.data;
+        const { uid } = response.data;
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("uid", uid);
+
         console.log(response.data); // Handle the successful sign-in response
         goProductPage();
         setLoading(true);
@@ -110,14 +112,14 @@ export default function Login() {
 
   return (
     <div className="flex flex-col w-full bg-orange">
-      <img src={logo} className="mx-auto w-1/4 my-8" />
+      <img src={logo} className="mx-auto md:w-1/4 xs:w-2/4 md:my-8 xs:my-7" />
       {/* z-index: 2  */}
-      <div className="flex justify-center mx-auto w-3/6 bg-white rounded-3xl z-10">
+      <div className="flex justify-center mx-auto xs:w-5/6 md:w-3/6 bg-white rounded-3xl z-10">
         <div className="card w-5/6 mb-60">
-          <h5 className="text-center text-3xl my-9">Login</h5>
+          <h5 className="text-center my-9 xs:text-2xl md:text-3xl">Login</h5>
 
           <form onSubmit={formik.handleSubmit} className="p-fluid ">
-            <div className="field mb-6">
+            <div className="field md:mb-6 xs:mb-4">
               <InputText
                 type="email"
                 id="email"
@@ -125,7 +127,6 @@ export default function Login() {
                 placeholder="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
-                //onBlur={formik.handleBlur}
                 className={`${custom.loginInput}`}
               />
             </div>
@@ -138,7 +139,6 @@ export default function Login() {
                 placeholder="password"
                 value={formik.values.password}
                 className={`${custom.loginInput}`}
-                //onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
               />
               {getFromErrorMessage()}
@@ -147,7 +147,7 @@ export default function Login() {
             <Button
               label={"Submit"}
               type="submit"
-              className={`mt-12 rounded-3xl bg-orange border-none`}
+              className={`mt-4 rounded-3xl bg-orange border-none`}
             />
           </form>
         </div>

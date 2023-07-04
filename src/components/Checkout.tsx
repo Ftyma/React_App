@@ -14,7 +14,7 @@ export function Checkout() {
   };
 
   return (
-    <div className="fixed bottom-0 bg-white w-full border py-3">
+    <div className="fixed bottom-0 bg-white w-screen border py-3">
       <div className=" flex justify-center">
         <Button
           className={`w-10/12 justify-center ${custom.bottomButton} `}
