@@ -23,7 +23,7 @@ type StoreItemProps = {
 };
 
 export function StoreItem({ product }: StoreItemProps) {
-  const { handleProdChange, cartItems, setCartItems } = useShoppingCart();
+  const { cartItems, setCartItems } = useShoppingCart();
   const [showDialog, setShowDialog] = useState(false);
 
   const [productId, setProductId] = useState<number>();
@@ -67,6 +67,11 @@ export function StoreItem({ product }: StoreItemProps) {
     }
   };
 
+  const handleQty = (e) => {
+    const value = e.target.value;
+    setProductQty(value);
+  };
+
   const handleAdd = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -97,11 +102,11 @@ export function StoreItem({ product }: StoreItemProps) {
         }
       );
       const updateCart = [...cartItems, newCart];
-
       alert("Added to cart!");
       console.log(updateCart);
       setShowDialog(false);
       setCartItems(updateCart);
+      setProductQty(1);
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
@@ -185,7 +190,7 @@ export function StoreItem({ product }: StoreItemProps) {
                     value={productQty}
                     min={1}
                     inputClassName={`w-5 text-center h-10`}
-                    onValueChange={(e) => handleProdChange(e, product._id)}
+                    onValueChange={(e) => handleQty(e)}
                   />
                 </div>
 

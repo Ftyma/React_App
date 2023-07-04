@@ -28,6 +28,7 @@ type ShoppingCartContext = {
   handleAddToCart: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   increaseCartQuantity: (id: number) => void;
+  addProductToCart: (id: any, quanitty: number) => void;
   handleSubmitOrder: () => void;
   fetchOrder: () => Promise<void>;
   handleChange: (e: any, id: number) => void;
@@ -341,7 +342,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
         handleSubmitOrder,
         handleChange,
         handleProdChange,
-
+        addProductToCart,
         totalPrice,
         orderItems,
         cartItems,
