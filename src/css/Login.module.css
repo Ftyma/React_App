@@ -5,3 +5,7 @@
 .pwInput {
   border-radius: 40px !important;
 }
+
+input {
+  border-radius: 40px !important;
+}

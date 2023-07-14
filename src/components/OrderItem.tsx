@@ -52,9 +52,9 @@ function OrderItem({ orderId, onClose }) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={goBack} />
+      <div className=" inset-0 bg-black bg-opacity-50" onClick={goBack} />
 
-      <div className="fixed bg-white inset-0 w-screen h-screen items-center justify-center z-10 ">
+      <div className="fixed bg-white inset-0 w-screen h-screen  z-10 ">
         <div className="bg-orange h-40">
           <Button
             icon="pi pi-chevron-left"
@@ -84,8 +84,10 @@ function OrderItem({ orderId, onClose }) {
               return (
                 <>
                   <div key={item._id} className="py-4">
-                    <p className="font-semibold">{item.product_name}</p>
-                    <div className="flex justify-between font-semibold">
+                    <p className="font-semibold lg:text-lg xs:text-md">
+                      {item.product_name}
+                    </p>
+                    <div className="flex justify-between font-semibold lg:text-lg xs:text-sm">
                       <p>{item.description}</p>
                       <p>x{item.quantity}</p>
                     </div>
@@ -101,8 +103,7 @@ function OrderItem({ orderId, onClose }) {
               <h1>Total: </h1>
               <h1 className="text-orange">{Currency(total)}</h1>
             </div>
-            <br />
-            <br />
+            <div className="h-32" />
           </div>
         </div>
       </div>

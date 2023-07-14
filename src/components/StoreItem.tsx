@@ -18,7 +18,6 @@ type StoreItemProps = {
     description: string;
     price: number;
     image: string;
-    _id: string;
   };
 };
 
@@ -50,11 +49,9 @@ export function StoreItem({ product }: StoreItemProps) {
     setShowDialog(true);
   };
 
-  const showPopup = () => {
-    setShowDialog(true);
-  };
   const handleCloseDialog = () => {
     setShowDialog(false);
+    setProductQty(1);
   };
 
   const increaseQty = () => {
@@ -82,30 +79,46 @@ export function StoreItem({ product }: StoreItemProps) {
         throw new Error("Token or UID is missing.");
       }
 
-      const newCart = {
-        id: productId,
-        product_name: productName,
-        price: productPrice,
-        image: productImg,
-        description: productDesc,
-        quantity: productQty,
-        uid: uid,
-      };
+      const existedItem = cartItems.find((item) => item.id === productId);
 
-      const res = await axios.post(
-        "http://localhost:3000/carts/add-carts",
-        newCart,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, //include token in req header
-          },
-        }
-      );
-      const updateCart = [...cartItems, newCart];
+      //if item exist, increase qty
+      //else create new cart
+      if (existedItem) {
+        const updatedCart = cartItems.map((item) => {
+          if (item.id === productId) {
+            return {
+              ...item,
+              quantity: item.quantity + productQty,
+            };
+          }
+          return item;
+        });
+        setCartItems(updatedCart);
+      } else {
+        const newCart = {
+          id: productId,
+          product_name: productName,
+          price: productPrice,
+          image: productImg,
+          description: productDesc,
+          quantity: productQty,
+          uid: uid,
+        };
+
+        const res = await axios.post(
+          "http://localhost:3000/carts/add-carts",
+          newCart,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setCartItems([...cartItems, newCart]);
+      }
+
       alert("Added to cart!");
-      console.log(updateCart);
       setShowDialog(false);
-      setCartItems(updateCart);
       setProductQty(1);
     } catch (error) {
       console.error("Error adding item to cart:", error);
@@ -114,47 +127,52 @@ export function StoreItem({ product }: StoreItemProps) {
 
   return (
     <>
-      <div className="col-3 md:col-3 lg:col-3">
+      <div className="md:col-3 lg:col-3 xs:col-3 ">
         <Card
-          className="border rounded-2xl xs:w-80 "
+          className={`border rounded-2xl  ${custom.prodCard}`}
           // style={{ width: "350px", height: "450px" }}
         >
           <img
             src={product.image}
-            onClick={() =>
-              selectProduct(
-                product.id,
-                product.product_name,
-                product.description,
-                product.price,
-                product.image,
-                productQty
-              )
-            }
             className="xs:w-40 md:w-48 md:h-48 mx-auto"
           />
 
-          <h1
-            className={`xs:text-lg md:text-xl  font-semibold  ${custom.productText}`}
-          >
-            {product.product_name}
-          </h1>
-          <h1 className="xs:text-md md:text-lg">{product.description}</h1>
+          <div className="flex flex-col">
+            <h1
+              className={`xs:text-md md:text-xl font-semibold  ${custom.productText}`}
+            >
+              {product.product_name}
+            </h1>
 
-          <br />
+            <h1 className={`xs:text-sm md:text-lg ${custom.productDescText}`}>
+              {product.description}
+            </h1>
+          </div>
+
           <div className="flex justify-between">
             <span>
-              <p className="text-lg text-orange">{Currency(product.price)}</p>
-              <p className="opacity-50 line-through">
+              <p className="lg:text-lg xs:text-md text-orange">
+                {Currency(product.price)}
+              </p>
+              <p className="lg:text-lg xs:text-md opacity-50 line-through">
                 {Currency(product.price)}
               </p>
             </span>
 
             <Button
-              className={`${custom.productAddButton}`}
+              className={`p-button-rounded p-button-circle  ${custom.productAddButton}`}
               icon="pi pi-plus"
-              onClick={showPopup}
-            ></Button>
+              onClick={() =>
+                selectProduct(
+                  product.id,
+                  product.product_name,
+                  product.description,
+                  product.price,
+                  product.image,
+                  productQty
+                )
+              }
+            />
           </div>
 
           {showDialog && (
@@ -164,11 +182,11 @@ export function StoreItem({ product }: StoreItemProps) {
                   className={`col-12 md:col-12 border pt-0 ${custom.popupCard}`}
                 >
                   <div>
-                    <p className="text-lg">{product.product_name}</p>
-                    <p className="font-semibold">{product.description}</p>
+                    <p className="text-lg">{productName}</p>
+                    <p className="font-semibold">{productDesc}</p>
                     <br />
                     <p className={`text-lg text-orange font-semibold`}>
-                      {Currency(product.price)}
+                      {Currency(productPrice)}
                     </p>
                   </div>
 

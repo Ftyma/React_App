@@ -15,14 +15,14 @@
 }
 
 .productText {
-  line-height: 1.5em;
-  height: 3em; /* height is 2x line-height, so two lines will display */
-  overflow: hidden;
+  line-height: 1.5em !important;
+  height: 3em !important; /* height is 2x line-height, so two lines will display */
+  overflow: hidden !important;
 }
 
 .productDescText {
-  line-height: 1.5em;
-  height: 3em; /* height is 2x line-height, so two lines will display */
+  line-height: 1.5em !important;
+  height: 3em !important; /* height is 2x line-height, so two lines will display */
   overflow: hidden;
 }
 
@@ -67,4 +67,34 @@
 .inputBox .p-inputtext {
   width: 1rem !important;
   background-color: #f16f22 !important;
+}
+
+.categoryBtn {
+  background-color: rgba(0, 0, 0, 0) !important;
+  color: black !important;
+  border: #f16f22 !important;
+}
+
+.prodCard {
+  width: 330px;
+  height: 420px;
+}
+
+.active {
+  background-color: #f16f22 !important;
+  color: white !important;
+  border-radius: 40px !important;
+  border-color: rgba(0, 0, 0, 0) !important;
+}
+
+@media (max-width: 360px) {
+  .prodCard {
+    width: 150px;
+    height: 330px;
+    margin: 5px;
+  }
+  .productAddButton {
+    width: 40px !important;
+    height: 40px !important;
+  }
 }

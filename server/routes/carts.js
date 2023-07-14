@@ -9,7 +9,7 @@ router.get("/get-carts", async (req, res) => {
   const uid = req.query.uid;
 
   try {
-    const carts = await Cart.find({ uid: uid });
+    const carts = await Cart.find({ uid: uid, status: 1 });
     const cartIds = carts.map((cart) => cart.id); //get Id of item in carts
     const products = await Product.find({ id: { $in: cartIds } });
 
@@ -44,7 +44,7 @@ router.post("/add-carts", async (req, res) => {
   const quantityChange = req.body.quantity;
 
   try {
-    const cartItem = await Cart.findOne({ id: productId });
+    const cartItem = await Cart.findOne({ id: productId, uid: req.body.uid });
 
     if (cartItem) {
       // Cart item exists, update the quantity
@@ -61,6 +61,7 @@ router.post("/add-carts", async (req, res) => {
         description: req.body.description,
         price: req.body.price,
         image: req.body.image,
+        status: req.body.status,
       });
       await newCartItem.save();
       res.status(200).json(newCartItem);

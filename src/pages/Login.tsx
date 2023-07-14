@@ -119,7 +119,7 @@ export default function Login() {
           <h5 className="text-center my-9 xs:text-2xl md:text-3xl">Login</h5>
 
           <form onSubmit={formik.handleSubmit} className="p-fluid ">
-            <div className="field md:mb-6 xs:mb-4">
+            <div className="field md:mb-4 xs:mb-4">
               <InputText
                 type="email"
                 id="email"
@@ -131,14 +131,14 @@ export default function Login() {
               />
             </div>
 
-            <div className="field">
+            <div className="mb-4">
               <Password
                 type="password"
                 id="password"
                 name="password"
                 placeholder="password"
                 value={formik.values.password}
-                className={`${custom.loginInput}`}
+                className={`border-round-xl ${custom.pwInput}`}
                 onChange={formik.handleChange}
               />
               {getFromErrorMessage()}

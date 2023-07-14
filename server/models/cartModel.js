@@ -31,6 +31,11 @@ const cartSchema = mongoose.Schema(
       required: true,
       default: 1,
     },
+    status: {
+      type: Number,
+      default: 1,
+      required: true,
+    },
     orderby: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",

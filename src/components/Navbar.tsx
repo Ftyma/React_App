@@ -12,7 +12,7 @@ export default function Navbar() {
         <Sidebar />
         <img
           src={logo}
-          className="mx-auto lg:w-3/12 lg:h-50 xs:w-6/12 xs:h-70"
+          className="mx-auto lg:w-3/12 md:h-28 lg:h-30 xs:w-6/12 xs:h-70"
         />
         {/* <div className="flex ">
           <Button icon="pi pi-plus" onClick={openCart} className=""></Button>

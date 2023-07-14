@@ -43,7 +43,7 @@ export default function Order() {
   return (
     <>
       <Navbar />
-      <div className="relative xs:top-20 md:top-60">
+      <div className="relative xs:top-36 md:top-60">
         <div className="w-10/12 mx-auto">
           <div className="grid m-auto">
             <p className=" bg-orange w-0.5 h-12 mr-4" />

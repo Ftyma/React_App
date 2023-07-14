@@ -124,9 +124,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col w-full bg-orange">
-      <img src={logo} className="mx-auto w-1/4 my-8" />
+      <img src={logo} className="mx-auto md:w-1/4 xs:w-2/4 md:my-8 xs:my-7" />
       {/* z-index: 2  */}
-      <div className="flex justify-center mx-auto w-3/6 bg-white rounded-3xl z-10">
+      <div className="flex justify-center mx-auto  xs:w-5/6 md:w-3/6 bg-white rounded-3xl z-10">
         <div className="card w-5/6 mb-60">
           <h5 className="text-center text-3xl my-9">Register</h5>
 
@@ -135,7 +135,7 @@ export default function Login() {
             onChange={formik.handleChange}
             className="p-fluid "
           >
-            <div className="field mb-6">
+            <div className="field mb-4">
               <InputText
                 type="username"
                 id="username"
@@ -148,7 +148,7 @@ export default function Login() {
               />
             </div>
 
-            <div className="field mb-6">
+            <div className="field mb-4">
               <InputText
                 type="email"
                 id="email"
@@ -161,7 +161,7 @@ export default function Login() {
               />
             </div>
 
-            <div className="field">
+            <div className="field mb-6">
               <Password
                 type="password"
                 id="password"

@@ -1,10 +1,11 @@
 import { Button } from "primereact/button";
 import React, { useState, useEffect } from "react";
+import custom from "../css/Products.module.css";
 
 const SelectionFilter = ({ filterCategory, handleClickCat }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [showAllOptions, setShowAllOptions] = useState(false);
-
+  const [activeOption, setActiveOption] = useState(0);
   const options = [
     { label: "All", value: 0 },
     { label: "Category 1", value: 1 },
@@ -41,7 +42,7 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
 
   return (
     <div className="flex items-center mt-6 md:justify-center">
-      <div className="md:hidden lg:hidden">
+      {/* <div className="md:hidden lg:hidden">
         <Button
           icon="pi pi-chevron-left"
           onClick={handleClickPrevious}
@@ -50,22 +51,27 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
           }`}
           disabled={currentPage === 0}
         />
-      </div>
+      </div> */}
 
-      <div className="overflow-x-auto whitespace-nowrap">
-        {visibleOptions.map((option, i) => (
+      <div className="overflow-x-auto whitespace-nowrap xs:mx-3">
+        {options.map((option, i) => (
           <Button
             key={i}
             value={filterCategory}
-            onClick={() => handleClickCat(option.value)}
-            className={` text-white text-sm mr-1 py-2 rounded-md hover:shadow-xl hover:scale-105`}
+            onClick={() => {
+              handleClickCat(option.value);
+              setActiveOption(option.value);
+            }}
+            className={`text-md font-semibold py-2  ${custom.categoryBtn} ${
+              option.value === activeOption ? custom.active : ""
+            }`}
           >
             {option.label}
           </Button>
         ))}
       </div>
 
-      <div className="md:hidden lg:hidden">
+      {/* <div className="md:hidden lg:hidden">
         <Button
           onClick={handleClickNext}
           className={`p-button-rounded p-button-text p-button-outlined ${
@@ -74,7 +80,7 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
           disabled={(currentPage + 1) * 4 >= options.length}
           icon="pi pi-chevron-right"
         />
-      </div>
+      </div> */}
     </div>
   );
 };

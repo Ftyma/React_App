@@ -30,16 +30,18 @@ const Cart = () => {
     }
   };
 
+  const cartOrder = cartItems.reverse();
+
   return (
     <div className="bg-orange h-screen">
       <Navbar />
-      <div className="bg-white h-full rounded-3xl relative top-52 ">
+      <div className="bg-white h-full rounded-3xl relative top-32 ">
         <br />
         <h1 className="text-3xl text-left ml-7 mt-4">Shopping Cart</h1>
         <div>
-          {cartItems.map((item) => (
+          {cartOrder.map((item) => (
             <div
-              key={item._id}
+              key={item.id}
               className="grid border rounded-xl my-4 w-10/12 mx-auto"
             >
               <Button
@@ -71,8 +73,8 @@ const Cart = () => {
                 </h1>
               </div>
 
-              <div className="col-6 md:col-3 m-auto flex xs:flex-row justify-center">
-                <div className="lg:col-4 md:col-3 xs:col-3">
+              <div className="col-6 md:col-3 m-auto flex xs:flex-row justify-center items-center">
+                <div className="lg:col-4 md:col-3 xs:col-3 lg:pl-3 xl:pl-5">
                   <Button
                     icon="pi pi-minus"
                     onClick={() => decreaseCartQuantity(item._id)}
@@ -84,7 +86,7 @@ const Cart = () => {
                   <InputNumber
                     value={item.quantity}
                     min={1}
-                    inputClassName={`md:w-10 xs:w-14 text-center h-10 my-auto`}
+                    inputClassName={`md:w-10 xs:w-14 w-100 text-center h-10 my-auto`}
                     onValueChange={(e) => handleChange(e, item._id)}
                   />
                 </div>
@@ -97,19 +99,13 @@ const Cart = () => {
                   />
                 </div>
               </div>
-
-              {/* <Button
-                icon="pi pi-trash"
-                className={`mx-auto p-button-rounded p-button-circle ${custom.removeBtn} `}
-                onClick={() => handleDelete(item._id)}
-              /> */}
             </div>
           ))}
         </div>
         <div className="h-64" />
 
-        <div className="fixed bottom-0 bg-white flex flex-col border py-4 shadow-2xl w-full mt-16">
-          <p className="text-xl font-semibold mx-auto">
+        <div className="fixed bottom-0 bg-white flex flex-col border lg:py-4 xs:py-2 shadow-2xl w-full mt-16">
+          <p className="lg:text-xl xs:text-lg font-semibold mx-auto">
             Total:{" "}
             <span className="lg:mx-24 xs:mx-2 ">{Currency(totalPrice())} </span>
           </p>

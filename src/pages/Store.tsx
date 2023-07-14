@@ -76,17 +76,17 @@ export default function Store() {
     <>
       <div className="bg-orange w-screen md:w-screen sm:w-screen">
         <Navbar />
-        <div className="relative border rounded-3xl bg-white w-full top-48">
+        <div className="relative border rounded-3xl bg-white w-full top-32">
           {/* Search Products*/}
-          <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 pt-10">
-            <h1 className="md:text-2xl xs:text-lg">List of Products</h1>
-            <div className="flex justify-content-end">
+          <div className="flex p-fluid flex-row mx-auto justify-between w-11/12 lg:pt-36 xs:pt-7">
+            <div className="flex w-full">
               <span className="p-input-icon-right">
                 <i className="pi pi-search" />
                 <InputText
                   value={filterQuery}
                   onChange={handleFilter}
                   placeholder="Keyword Search"
+                  className="w-full"
                 />
               </span>
             </div>
@@ -107,6 +107,7 @@ export default function Store() {
                   <StoreItem product={item} />
                 </div>
               ))}
+              <div className=" h-52" />
               <Checkout />
             </div>
           )}
