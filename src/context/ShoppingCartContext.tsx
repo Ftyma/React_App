@@ -49,7 +49,7 @@ export function useShoppingCart() {
 
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [orderItems, setOrderItems] = useState<any>([]);
 
   useEffect(() => {
     fetchCart();
@@ -162,7 +162,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       });
   };
 
-  const handleChange = async (e, productId: any) => {
+  const handleChange = async (e: any, productId: any) => {
     const newQuantity = parseInt(e.value);
 
     getCartById(productId)
@@ -188,7 +188,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   };
 
   //// for store Item
-  const handleProdChange = async (e, productId: any) => {
+  const handleProdChange = async (e: any, productId: any) => {
     const newQuantity = parseInt(e.value);
     getProductById(productId)
       .then((productData) => {
@@ -295,7 +295,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       const productData = res.data;
       console.log("product get by ID:", productData);
       return productData;
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error: ", error.response.data);
       throw new Error("Failed to retrieve product.");
     }
@@ -307,7 +307,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       const productData = res.data;
       console.log("cart get by ID:", productData);
       return productData;
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error: ", error.response.data);
       throw new Error("Failed to retrieve product.");
     }

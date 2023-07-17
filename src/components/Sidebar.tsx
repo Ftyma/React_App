@@ -82,7 +82,7 @@ export default function Sidebar() {
             <br />
             <div className="mx-auto w-60">
               <div>
-                {user.map((u) => (
+                {user.map((u: any) => (
                   <h1 className="font-semibold text-lg m">
                     Hello, {u.username.toUpperCase()}
                   </h1>
@@ -91,7 +91,7 @@ export default function Sidebar() {
 
               <div className="bg-black  h-0.5 opacity-20 my-3" />
               <ul className="grid" onClick={toggleMenu}>
-                {menuList.map((item, i) => {
+                {menuList.map((item: any, i) => {
                   return (
                     <>
                       <div key={item.id} className="col-6 md:col-6">

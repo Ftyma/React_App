@@ -1,11 +1,15 @@
 import { Button } from "primereact/button";
 import React, { useEffect, useState } from "react";
-import { useShoppingCart } from "../context/ShoppingCartContext";
 import { Currency } from "./Currency";
 import custom from "../css/Cart.module.css";
 import axios from "axios";
 
-function OrderItem({ orderId, onClose }) {
+type Tdata = {
+  orderId: any;
+  onClose: () => void;
+};
+
+function OrderItem(props: Tdata) {
   const [order, setOrder] = useState([]);
 
   useEffect(() => {
@@ -34,12 +38,14 @@ function OrderItem({ orderId, onClose }) {
       .catch((err) => console.log(err));
   };
 
-  const selectedOrder = order.find((item) => item._id === orderId);
+  const selectedOrder: any = order.find(
+    (item: any) => item._id === props.orderId
+  );
   console.log("select order", selectedOrder);
-  console.log(orderId);
+  console.log(props.orderId);
 
   const goBack = () => {
-    onClose();
+    props.onClose();
   };
 
   if (!selectedOrder) {
@@ -79,7 +85,7 @@ function OrderItem({ orderId, onClose }) {
             </div>
             <div className="h-px bg-gray-500" />
 
-            {selectedOrder.orders.map((item) => {
+            {selectedOrder.orders.map((item: any) => {
               total += item.price * item.quantity;
               return (
                 <>

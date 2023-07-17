@@ -30,7 +30,7 @@ export default function Order() {
         },
       })
       .then((res) => {
-        const sortList = res.data.sort((a, b) => {
+        const sortList = res.data.sort((a: any, b: any) => {
           moment(a.date).diff(moment(b.date));
         });
         const reversedItems = sortList.reverse();
@@ -50,7 +50,7 @@ export default function Order() {
             <h1 className="font-semibold text-3xl">Order History</h1>
           </div>
 
-          {items.map((item) => (
+          {items.map((item: any) => (
             <div
               key={item._id}
               onClick={() => setSelectedOrder(item._id)}

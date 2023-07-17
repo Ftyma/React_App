@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Button } from "primereact/button";
 import custom from "../css/Products.module.css";
 import { useNavigate } from "react-router-dom";

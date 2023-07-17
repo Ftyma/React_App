@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import logo from "../assets/logo.svg";
 import footerImg from "../assets/footer.svg";
 import { FormikErrors, useFormik } from "formik";
@@ -12,11 +12,11 @@ import { Password } from "primereact/password";
 import axios, { AxiosError } from "axios";
 
 export default function Login() {
-  const [formError, setFormError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [formError, setFormError] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
-  const authentication = (data: any) => {
-    setFormError(false);
+  const authentication = () => {
+    // setFormError(false);
   };
 
   let navigate = useNavigate();
@@ -34,12 +34,12 @@ export default function Login() {
 
       if (!data.email) {
         errors.email = "Email";
-        setFormError(true);
+        //setFormError(true);
       }
 
       if (!data.password) {
         errors.password = "Password";
-        setFormError(true);
+        //setFormError(true);
       }
       return errors;
     },
@@ -61,7 +61,7 @@ export default function Login() {
 
         console.log(response.data); // Handle the successful sign-in response
         goProductPage();
-        setLoading(true);
+        //setLoading(true);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError;
@@ -75,7 +75,7 @@ export default function Login() {
       console.log(data);
       //setLoading(true);
       setTimeout(() => {
-        authentication(data);
+        authentication();
       }, 500);
     },
   });
@@ -98,14 +98,12 @@ export default function Login() {
 
   const getFromErrorMessage = () => {
     if (formik.touched.email && formik.errors.email) {
-      return (
-        <small className="p-error">{formik.errors.email} is required.</small>
-      );
+      return true;
+      //<small className="p-error">{formik.errors.email} is required.</small>
     }
     if (formik.touched.password && formik.errors.password) {
-      return (
-        <small className="p-error">{formik.errors.password} is required.</small>
-      );
+      return false;
+      // <span className="p-error">{formik.errors.password} is required.</span>
     }
     return null;
   };

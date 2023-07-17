@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Currency } from "../components/Currency";
 import { useShoppingCart } from "../context/ShoppingCartContext";
 import Navbar from "../components/Navbar";
@@ -24,7 +24,7 @@ const Cart = () => {
     navigate("/order");
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: any) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       removeItem(id);
     }
@@ -39,7 +39,7 @@ const Cart = () => {
         <br />
         <h1 className="text-3xl text-left ml-7 mt-4">Shopping Cart</h1>
         <div>
-          {cartOrder.map((item) => (
+          {cartOrder.map((item: any) => (
             <div
               key={item.id}
               className="grid border rounded-xl my-4 w-10/12 mx-auto"

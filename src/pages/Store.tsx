@@ -102,7 +102,7 @@ export default function Store() {
             <ProgressSpinner className="justify-center" />
           ) : (
             <div className="grid w-11/12 justify-center mx-auto pt-16">
-              {filterData.map((item) => (
+              {filterData.map((item: any) => (
                 <div key={item.id}>
                   <StoreItem product={item} />
                 </div>

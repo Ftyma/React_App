@@ -1,11 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import Sidebar from "./Sidebar";
 
 export default function Navbar() {
-  let navigate = useNavigate();
-
   return (
     <>
       <div className="fixed bg-orange w-screen z-2">

@@ -2,9 +2,14 @@ import { Button } from "primereact/button";
 import React, { useState, useEffect } from "react";
 import custom from "../css/Products.module.css";
 
-const SelectionFilter = ({ filterCategory, handleClickCat }) => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [showAllOptions, setShowAllOptions] = useState(false);
+type Tdata = {
+  handleClickCat: (data: any) => void;
+  filterCategory: any;
+};
+
+const SelectionFilter = (data: Tdata) => {
+  //const [currentPage, setCurrentPage] = useState(0);
+  //const [showAllOptions, setShowAllOptions] = useState(false);
   const [activeOption, setActiveOption] = useState(0);
   const options = [
     { label: "All", value: 0 },
@@ -15,17 +20,9 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
     { label: "Category 5", value: 5 },
   ];
 
-  const handleClickPrevious = () => {
-    setCurrentPage(currentPage - 1);
-  };
-
-  const handleClickNext = () => {
-    setCurrentPage(currentPage + 1);
-  };
-
   useEffect(() => {
     const handleResize = () => {
-      setShowAllOptions(window.innerWidth > 640); // Show all options on wide screens
+      //setShowAllOptions(window.innerWidth > 640); // Show all options on wide screens
     };
 
     handleResize(); // Call initially to set the correct showAllOptions value
@@ -36,9 +33,9 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
       window.removeEventListener("resize", handleResize); // Clean up the event listener on component unmount
     };
   }, []);
-  const startIndex = showAllOptions ? 0 : currentPage * 3;
-  const endIndex = showAllOptions ? options.length : (currentPage + 1) * 3;
-  const visibleOptions = options.slice(startIndex, endIndex);
+  //const startIndex = showAllOptions ? 0 : currentPage * 3;
+  //const endIndex = showAllOptions ? options.length : (currentPage + 1) * 3;
+  //  const visibleOptions = options.slice(startIndex, endIndex);
 
   return (
     <div className="flex items-center mt-6 md:justify-center">
@@ -57,9 +54,9 @@ const SelectionFilter = ({ filterCategory, handleClickCat }) => {
         {options.map((option, i) => (
           <Button
             key={i}
-            value={filterCategory}
+            value={data.filterCategory}
             onClick={() => {
-              handleClickCat(option.value);
+              data.handleClickCat(option.value);
               setActiveOption(option.value);
             }}
             className={`text-md font-semibold py-2  ${custom.categoryBtn} ${

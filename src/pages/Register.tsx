@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import logo from "../assets/logo.svg";
 import footerImg from "../assets/footer.svg";
 import { FormikErrors, useFormik } from "formik";
@@ -13,7 +13,7 @@ import { Password } from "primereact/password";
 
 export default function Login() {
   const [formError, setFormError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [postUsers, setPostUsers] = useState({
     username: "",
     email: "",
@@ -26,7 +26,7 @@ export default function Login() {
     navigate("/store");
   };
 
-  const authentication = (data: any) => {
+  const authentication = () => {
     setFormError(false);
   };
 
@@ -88,9 +88,9 @@ export default function Login() {
       });
 
       console.log(data);
-      setLoading(true);
+      // setLoading(true);
       setTimeout(() => {
-        authentication(data);
+        authentication();
       }, 500);
     },
   });
@@ -105,18 +105,18 @@ export default function Login() {
 
   const getFromErrorMessage = () => {
     let errorMsg: String = "";
-    let status: Boolean = false;
+    //let status: Boolean = false;
     if (formik.touched.username || formik.errors.username) {
       errorMsg = `${formik.errors.username} is required .`;
-      status = true;
+      //status = true;
     } else if (formik.touched.email || formik.errors.email) {
       errorMsg = `${formik.errors.email} is required .`;
-      status = true;
+      //status = true;
     } else if (formik.touched.password || formik.errors.password) {
       errorMsg = `${formik.errors.password} is required .`;
-      status = true;
+      //status = true;
     } else {
-      status = false;
+      //status = false;
     }
     console.log(errorMsg);
     return formError && <small className="p-error">{errorMsg}</small>;

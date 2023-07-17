@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import custom from "../css/Products.module.css";
 import axios from "axios";
@@ -64,7 +64,7 @@ export function StoreItem({ product }: StoreItemProps) {
     }
   };
 
-  const handleQty = (e) => {
+  const handleQty = (e: any) => {
     const value = e.target.value;
     setProductQty(value);
   };
@@ -105,15 +105,11 @@ export function StoreItem({ product }: StoreItemProps) {
           uid: uid,
         };
 
-        const res = await axios.post(
-          "http://localhost:3000/carts/add-carts",
-          newCart,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        await axios.post("http://localhost:3000/carts/add-carts", newCart, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setCartItems([...cartItems, newCart]);
       }
 
