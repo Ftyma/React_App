@@ -27,7 +27,7 @@ export default function Store() {
 
   const fetchProduct = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/products");
+      const res = await axios.get(`${url}products`);
       setProductAll(res.data);
       console.log("fetched all products ", res.data);
       setLoading(false);

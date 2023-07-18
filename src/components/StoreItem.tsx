@@ -22,6 +22,8 @@ type StoreItemProps = {
 };
 
 export function StoreItem({ product }: StoreItemProps) {
+  const url = import.meta.env.VITE_API;
+
   const { cartItems, setCartItems } = useShoppingCart();
   const [showDialog, setShowDialog] = useState(false);
 
@@ -105,7 +107,7 @@ export function StoreItem({ product }: StoreItemProps) {
           uid: uid,
         };
 
-        await axios.post("http://localhost:3000/carts/add-carts", newCart, {
+        await axios.post(`${url}carts/add-carts`, newCart, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

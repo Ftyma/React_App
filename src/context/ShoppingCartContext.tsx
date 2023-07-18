@@ -50,6 +50,7 @@ export function useShoppingCart() {
 export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [orderItems, setOrderItems] = useState<any>([]);
+  const url = import.meta.env.VITE_API;
 
   useEffect(() => {
     fetchCart();
@@ -62,7 +63,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
   const fetchCart = async () => {
     const uid = localStorage.getItem("uid");
     await axios
-      .get(`http://localhost:3000/carts/get-carts?uid=${uid}`)
+      .get(`${url}carts/get-carts?uid=${uid}`)
       .then((res) => {
         setCartItems(res.data);
       })
@@ -79,7 +80,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
     }
 
     await axios
-      .get(`http://localhost:3000/orders?uid=${uid}`, {
+      .get(`${url}orders?uid=${uid}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -124,7 +125,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
     axios
       .post(
-        "http://localhost:3000/orders/submit",
+        `${url}orders/submit`,
         {
           uid: uid,
         },
@@ -267,7 +268,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
       }
 
       const res = await axios.post(
-        "http://localhost:3000/carts/add-carts",
+        `${url}carts/add-carts`,
         {
           ...product,
           quantity: quantity,
@@ -289,9 +290,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
   const getProductById = async (productId: any) => {
     try {
-      const res = await axios.get(
-        `http://localhost:3000/products/${productId}`
-      );
+      const res = await axios.get(`${url}products/${productId}`);
       const productData = res.data;
       console.log("product get by ID:", productData);
       return productData;
@@ -303,7 +302,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
   const getCartById = async (productId: any) => {
     try {
-      const res = await axios.get(`http://localhost:3000/carts/${productId}`);
+      const res = await axios.get(`${url}carts/${productId}`);
       const productData = res.data;
       console.log("cart get by ID:", productData);
       return productData;
@@ -315,7 +314,7 @@ export function ShoppingCartProvider({ children }: ShoppingCartProviderProps) {
 
   const removeItem = async (id: number) => {
     await axios
-      .delete(`http://localhost:3000/carts/delete-carts/${id}`)
+      .delete(`${url}carts/delete-carts/${id}`)
       .then(() => {
         // var items = cartItems;
         // // find index

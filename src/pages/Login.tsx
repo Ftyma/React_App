@@ -24,6 +24,8 @@ export default function Login() {
     navigate("/store");
   };
 
+  const url = import.meta.env.VITE_API;
+
   const formik = useFormik<any>({
     initialValues: {
       email: "",
@@ -45,13 +47,10 @@ export default function Login() {
     },
     onSubmit: async (data) => {
       try {
-        const response = await axios.post(
-          "http://localhost:3000/users/signin",
-          {
-            email: data.email,
-            password: data.password,
-          }
-        );
+        const response = await axios.post(`${url}users/signin`, {
+          email: data.email,
+          password: data.password,
+        });
 
         const { token } = response.data;
         const { uid } = response.data;

@@ -20,6 +20,8 @@ export default function Login() {
     password: "",
   });
 
+  const url = import.meta.env.VITE_API;
+
   let navigate = useNavigate();
 
   const goProductPage = () => {
@@ -59,7 +61,7 @@ export default function Login() {
     onSubmit: async (data) => {
       try {
         await axios
-          .post("http://localhost:3000/users/signup", postUsers)
+          .post(`${url}users/signup`, postUsers)
           .then((res) => {
             console.log(res.data);
             alert("succesfully registered");
@@ -182,10 +184,7 @@ export default function Login() {
             />
             <h1 className="text-center mt-3">
               Already has an account?{" "}
-              <a
-                href="http://localhost:5173/login"
-                className="text-blue underline"
-              >
+              <a href={`${url}login`} className="text-blue underline">
                 Login
               </a>
             </h1>

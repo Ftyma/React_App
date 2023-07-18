@@ -11,6 +11,7 @@ type Tdata = {
 
 function OrderItem(props: Tdata) {
   const [order, setOrder] = useState([]);
+  const url = import.meta.env.VITE_API;
 
   useEffect(() => {
     fetchOrder();
@@ -26,7 +27,7 @@ function OrderItem(props: Tdata) {
     }
 
     await axios
-      .get(`http://localhost:3000/orders?uid=${uid}`, {
+      .get(`${url}orders?uid=${uid}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
