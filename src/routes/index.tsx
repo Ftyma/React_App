@@ -21,12 +21,12 @@ const Middleware = ({ children }: { children: JSX.Element }) => {
 };
 const Router = createBrowserRouter([
   {
-    path: "/",
+    path: "",
     element: <LayoutMain />,
     errorElement: <LayoutMain />,
     children: [
       {
-        path: "/cart",
+        path: "cart",
         element: (
           <Middleware>
             <Cart />
@@ -34,7 +34,7 @@ const Router = createBrowserRouter([
         ),
       },
       {
-        path: "/store",
+        path: "store",
         element: (
           <Middleware>
             <Store />
@@ -42,7 +42,7 @@ const Router = createBrowserRouter([
         ),
       },
       {
-        path: "/order",
+        path: "order",
         element: (
           <Middleware>
             <Order />
@@ -50,15 +50,15 @@ const Router = createBrowserRouter([
         ),
       },
       {
-        path: "/login",
+        path: "login",
         element: <Login />,
       },
       {
-        path: "/register",
+        path: "register",
         element: <Register />,
       },
       {
-        path: "/404",
+        path: "404",
         element: <Page404 />,
       },
     ],
