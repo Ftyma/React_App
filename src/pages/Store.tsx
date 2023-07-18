@@ -15,6 +15,8 @@ export default function Store() {
 
   const [loading, setLoading] = useState(true);
 
+  const url = import.meta.env.VITE_API;
+
   useEffect(() => {
     fetchProduct();
   }, []);
